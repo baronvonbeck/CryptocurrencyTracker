@@ -1,0 +1,107 @@
+/* style.css */
+
+/*
+    #4C516D - Independence (ambient blue)
+    #367588 - Teal Blue
+*/
+
+/* reset */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* wrappers */
+.main-title {
+    font-family: 'Fjalla One', sans-serif;
+    font-size: 2.5em;
+    text-align: center;
+    margin: 20px 10px 10px 10px;
+}
+
+#main-table-wrapper {
+    width: 80%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+}
+#sort-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+    text-align: center;
+}
+/*
+#div2 {
+    margin-right: -4px;
+    display: inline-block;
+    width: 30%;
+    vertical-align: top;
+    margin-bottom: 2%;
+    text-align: center;
+} */
+
+/* table properties */
+#main-table {
+    width: 100%;
+    color: white;
+    background-color: black;
+    text-align: center;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+#main-table tr td:first-child {
+    background-color: #404040;
+}
+#main-table tr td a{
+    color: inherit;
+    text-decoration: none;
+}
+#main-table tr td a:hover{
+    color: green;
+    text-decoration: none;
+}
+#main-table tr td{
+    /*background-color: #606060*/;
+    background-color: black;
+}
+.market-header {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 1.2em;
+    background-color: #4C516D;
+
+}
+.header {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 1.2em;
+    background-color: #367588;
+}
+#main-table .selected td {
+    background-color: #CCCC00 !important;
+}
+
+#main-table tr .left {
+    color: white;
+    background-color: #303030; /* !important; */
+}
+
+#main-table tr .right {
+    color: white;
+    background-color: #303030; /* !important; */
+}
+
+/* td properties
+.market {
+
+}
+.bid {
+
+}
+.ask {
+
+}
+.last {
+
+}
+*/
