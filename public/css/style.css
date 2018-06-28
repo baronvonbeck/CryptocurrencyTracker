@@ -4,6 +4,8 @@
     #4C516D - Independence (ambient blue)
     #367588 - Teal Blue
 */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+@import url('https://fonts.googleapis.com/css?family=Encode+Sans+Semi+Expanded');
 
 /* reset */
 * {
@@ -13,14 +15,14 @@
 
 /* wrappers */
 .main-title {
-    font-family: 'Fjalla One', sans-serif;
+    font-family: 'Encode Sans Semi Expanded', sans-serif;
     font-size: 2.5em;
     text-align: center;
     margin: 20px 10px 10px 10px;
 }
 
 #main-table-wrapper {
-    width: 80%;
+    width: 90%;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -46,49 +48,74 @@
 #main-table {
     width: 100%;
     color: white;
-    background-color: black;
+    background-color: none;
     text-align: center;
-    font-family: 'Ubuntu', sans-serif;
+    /*font-family: 'Ubuntu', sans-serif; */
+    border-spacing: 1px;
 }
 
 #main-table tr td:first-child {
-    background-color: #404040;
+    background-color: #F4FFF8; /* F4FFF8 */
+    color: black;
+    border-left: 2px solid #1D1E2C;
+    border-right: 2px solid #1D1E2C;
+    border-bottom: 2px solid #1D1E2C;
 }
 #main-table tr td a{
     color: inherit;
     text-decoration: none;
 }
 #main-table tr td a:hover{
-    color: green;
+    color: blue;
     text-decoration: none;
 }
 #main-table tr td{
     /*background-color: #606060*/;
+    padding: 10px 4px;
     background-color: black;
+    border-bottom: 2.5px solid #1D1E2C;
+}
+
+#main-table tr td:last-child {
+    border-left: 2px solid #1D1E2C;
+    border-right: 2px solid #1D1E2C;
+    border-bottom: 2.5px solid #1D1E2C;
 }
 .market-header {
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 1.2em;
-    background-color: #4C516D;
-
+    /*font-family: 'Ubuntu', sans-serif; */
+    font-family: 'Encode Sans Semi Expanded', sans-serif;
+    font-weight: lighter;
+    font-size: 1.25em;
+    background-color: #1D1E2C; /*4C516D */
+    height: 25px;
+    padding: 5px;
+    border-top-left-radius: 5px;
 }
 .header {
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 1.2em;
-    background-color: #367588;
+    font-family: 'Encode Sans Semi Expanded', sans-serif;
+    font-weight: lighter;
+    font-size: 1.25em;
+    background-color: #1D1E2C;
+}
+.header:last-child {
+    border-top-right-radius: 5px;
 }
 #main-table .selected td {
-    background-color: #CCCC00 !important;
+    background-color: #FFFC82 !important;
 }
 
 #main-table tr .left {
-    color: white;
-    background-color: #303030; /* !important; */
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 400;
+    color: #413F68;
+    background-color: #F4FFF8; /* !important; */
 }
 
 #main-table tr .right {
-    color: white;
-    background-color: #303030; /* !important; */
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #413F68;
+    font-weight: 400;
+    background-color: #F4FFF8; /* !important; */
 }
 
 /* td properties
