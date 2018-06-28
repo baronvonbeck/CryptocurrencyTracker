@@ -1,33 +1,54 @@
 // app.js
-const PORT = 3000;
-const express = require('express');
-const mainRoutes = require('./routes/main');
 
-const AWS = require("aws-sdk");
+// Include the cluster module
+var cluster = require('cluster');
 
-AWS.config.update({
-    region: "us-west-2",
-    endpoint: "http://localhost:8000"
-});
+// Code to run if we're in the master process
+if (cluster.isMaster) {
 
-var dynamodb = new AWS.DynamoDB();
+    // Count the machine's CPUs
+    var cpuCount = require('os').cpus().length;
 
-// app & middleware setup
-const app = express();
-app.set('view engine', 'ejs');
-app.set('views', './views');
+    // Create a worker for each CPU
+    for (var i = 0; i < cpuCount; i += 1) {
+        cluster.fork();
+    }
 
-app.use(function(req, res, next) {
-    console.log(`${req.method} request for '${req.url}'`);
-    next();
-});
-app.use('/', mainRoutes);
-app.use(express.static('public'));
+    // Listen for terminating workers
+    cluster.on('exit', function (worker) {
 
+        // Replace the terminated workers
+        console.log('Worker ' + worker.id + ' died :(');
+        cluster.fork();
+    });
 
-app.set('port', process.env.PORT || 8080);
-app.listen(app.get('port'), () => {
-    console.log("Listening on port: " + app.get('port'));
-});
+// Code to run if we're in a worker process
+}
+else {
+    const PORT = 3000;
+    const express = require('express');
+    const mainRoutes = require('./routes/main');
+    const marketChainDataRoutes = require('./routes/MarketChainData');
+    const marketChainNameRoutes = require('./routes/MarketNameData');
 
-module.exports = app;
+    // app & middleware setup
+    const app = express();
+    app.set('view engine', 'ejs');
+    app.set('views', './views');
+
+    app.use(function(req, res, next) {
+        console.log(`${req.method} request for '${req.url}'`);
+        next();
+    });
+    app.use('/', mainRoutes);
+    app.use('/', marketChainDataRoutes);
+    app.use('/', marketChainNameRoutes);
+    app.use(express.static('public'));
+
+    app.set('port', process.env.PORT || 8080);
+    app.listen(app.get('port'), () => {
+        console.log("Listening on port: " + app.get('port'));
+    });
+
+    module.exports = app;
+}
