@@ -1,7 +1,7 @@
 @import "style.css";
 
 body {
-    background-color: #F1F0EA;
+    background-color: #F1F1F1;
 }
 
 h1 {
@@ -18,18 +18,32 @@ h1 {
 }
 
 h2 {
-
-    margin: 0px auto;
     font-size: 2em;
     text-align: center;
     font-family: 'Ubuntu', sans-serif;
     font-weight: lighter;
     background-color: #2D232E;
     color: white;
-    padding: 20px;
-    margin: 20px auto;
+    padding: 30px;
+    margin: 0 auto;
     width: 75%;
     border-radius: 5px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+}
+p {
+    padding: 40px 30px;
+    font-size: 1.1em;
+    line-height: 2em;
+    letter-spacing: 0.1em;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #F3E8EE;/*#C7D6D5; */
+    text-align: left;
+    width: 75%;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    color: #3E405A;
 }

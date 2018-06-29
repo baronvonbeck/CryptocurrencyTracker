@@ -27,7 +27,9 @@
     </div>
     <h1>About Us</h1>
     <h2>Who We Are</h2>
+    <p>We are a small team of software developers that love to explore a variety of different topics. This includes taking a closer look at the cryptocurrency market. Our goal for this work is to analyze trends in market chain exchange rates via a common platform's API (Bittrex). Sound cool? We thought so too!</p>
     <h2>Project Description</h2>
+    <p>The project takes the form of a table displaying both left and right "loops" of market chains like Bitcoin (BTC) and Ethereum (ETH). As an example, let us say we have the market: <strong>BTC_AAA_ETH</strong>. We would then have two loops. The left loop would look like <strong>BTC &rarr; ETH &rarr; AAA &rarr; BTC </strong>, and the right loop would look like <strong>BTC &rarr; AAA &rarr; ETH &rarr; BTC </strong>. <br><br>We simply calculate the exchange rates by looping to-and-from the origin market. In this case, our origin market is BTC. We see if exchanging currency, starting and ending with BTC, from <strong>ETH &rarr; AAA </strong> or <strong>AAA &rarr; ETH</strong> are profitable. A loop is profitable if we manage to find a ratio above 1.0 in the exchange rate in either loop of a market. </p>
 </body>
 
 <!-- Scripts -->
