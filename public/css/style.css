@@ -6,11 +6,55 @@
 */
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 @import url('https://fonts.googleapis.com/css?family=Encode+Sans+Semi+Expanded');
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
 
 /* reset */
 * {
     margin: 0;
     padding: 0;
+}
+
+/* nav styles */
+.main-nav nav {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: light;
+  display: flex;
+  text-align: center;
+  position: relative;
+  background-color: #1D1E2C;
+  justify-content: center;
+}
+
+.main-nav nav a {
+  color: white;
+  font-size: 1.7em;
+  align-items: center;
+
+  padding: 10px 40px;
+  background-color: none;
+  position: relative;
+  text-decoration: none;
+  /* BCC1BA */
+}
+
+.main-nav nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 4px ;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  background-color: #BCC1BA;
+  transform: scaleX(0);
+  transition: all .2s linear;
+}
+
+.main-nav nav a:hover {
+  color: #EDD39C;
+}
+
+.main-nav nav a:hover::after {
+  transform: scaleX(1);
 }
 
 /* wrappers */

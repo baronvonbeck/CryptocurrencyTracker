@@ -10,6 +10,10 @@ router.get('/', (req, res) => {
     res.render('table');
 });
 
+router.get('/about', (req, res) => {
+    res.render('about');
+});
+
 // Get available markets
 router.get('/markets', (req, res) => {
     var url = BITTREX + 'getmarkets';

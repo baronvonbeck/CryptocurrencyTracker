@@ -1,0 +1,35 @@
+@import "style.css";
+
+body {
+    background-color: #F1F0EA;
+}
+
+h1 {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 3em;
+    font-weight: lighter;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    background-color: #2D232E;
+    width: 95%;
+    border-radius: 5px;
+}
+
+h2 {
+
+    margin: 0px auto;
+    font-size: 2em;
+    text-align: center;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: lighter;
+    background-color: #2D232E;
+    color: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 75%;
+    border-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
