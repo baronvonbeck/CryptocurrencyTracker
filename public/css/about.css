@@ -8,13 +8,13 @@ h1 {
     font-family: 'Ubuntu', sans-serif;
     font-size: 3em;
     font-weight: lighter;
-    margin: 20px auto;
+    margin: 40px auto;
     padding: 20px;
     text-align: center;
     color: white;
-    background-color: #2D232E;
-    width: 95%;
-    border-radius: 5px;
+    background-color: #2D232E; /*1D1E2C; */
+    width: 100%;
+
 }
 
 h2 {
@@ -38,7 +38,7 @@ p {
     letter-spacing: 0.1em;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 20px;
+    margin-bottom: 50px;
     font-family: 'Ubuntu', sans-serif;
     background-color: #F3E8EE;/*#C7D6D5; */
     text-align: left;
