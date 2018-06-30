@@ -97,6 +97,7 @@ var highlightedMarkets = {};
 
                  $("#main-table").append(
                      '<tr class="trow">' +
+                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>'+
                      '<td class="market" id=' + selectID + '>' + market.name + '</td>' +
                      '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
                      '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
@@ -142,6 +143,11 @@ var highlightedMarkets = {};
                  $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
 
                  $(selectID).html(
+                     '<div class="avatar-container">' +
+                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '</div>' +
                      "<a href=#" + market.name + ">" + market.name + "</a>"
                  );
                  $(selectIDLeft).html(

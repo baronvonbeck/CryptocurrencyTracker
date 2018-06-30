@@ -98,6 +98,19 @@
     border-spacing: 1px;
 }
 
+#main-table tr td .avatar-container {
+    display: relative;
+    width: auto;
+    height: auto;
+    margin-bottom: 10px;
+}
+#main-table tr td .td-avatar {
+    border-radius: 50%;
+    box-shadow: 0px 2px gray;
+    width: 32px;
+    margin: 0 5px;
+}
+
 #main-table tr td:first-child {
     background-color: #F4FFF8; /* F4FFF8 */
     color: black;
@@ -114,6 +127,7 @@
     text-decoration: none;
 }
 #main-table tr td{
+    position: relative;
     /*background-color: #606060*/;
     padding: 10px 4px;
     background-color: black;
