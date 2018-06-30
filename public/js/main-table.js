@@ -24,7 +24,8 @@ var conversions = {};
 var validMarkets =  {
     "BTC"   : true,
     "ETH"   : true,
-    "USDT"  : true
+    "USDT"  : true,
+    "USD"   : true
 };
 
 // associative arrays to hold each chain loop
@@ -57,7 +58,6 @@ var fee = 0.992518734375;
 // maintain track of what rows are highlighted in the main table
 var highlightedMarkets = {};
 
-
  $(document).ready(function() {
      initialize();
 
@@ -66,6 +66,21 @@ var highlightedMarkets = {};
      }, 1000);
 
  });
+
+ function postValidMarket(marketData) {
+
+     $.ajax({
+         type: 'POST',
+         url: '/putvalidmarket',
+         async: true,
+         data: JSON.stringify(marketData),
+         dataType: 'json',
+         contentType: "application/json",
+         success: (function(data) {
+             console.log("Return succsessful!");
+         })
+     });
+ }
 
 
  function initialize() {
@@ -110,6 +125,18 @@ var highlightedMarkets = {};
 
              // make reference to a deep copy
              previousMarkets = currentMarkets.slice(0);
+
+             //TODO: delet this
+             for (var i = 0; i < markets.length; i ++) {
+                 var market = markets[i];
+                 postValidMarket({
+                     MarketChainName: market.name,
+                     MarketLeftName: market.leftname,
+                     MarketRightName: market.rightname
+                 });
+
+             }
+             // end delete
          })
      });
  }

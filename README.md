@@ -17,14 +17,14 @@ Tracking cryptocurrency chains.
 ## How to Run
 Run DynamoDB Local.
 
-In the directory where the repository is,     
+In the directory where the repository is, run either   
 
     * node ./app.js
     * nodemon ./app.js
 
-Now, navigate to the following URL : http://localhost:8000
+Now, navigate to the following URL : http://localhost:8080
 
-The default URL is set to localhost with port # 8000.
+The default URL is set to localhost with port # 8080.
 
 ## TODO
     * User environment file for port (default is 8000).

@@ -27,14 +27,18 @@ if (cluster.isMaster) {
 else {
     const PORT = 3000;
     const express = require('express');
+    const bodyParser = require('body-parser');
     const mainRoutes = require('./routes/main');
     const marketChainDataRoutes = require('./routes/MarketChainData');
-    const marketChainNameRoutes = require('./routes/MarketNameData');
+    const marketChainNameRoutes = require('./routes/MarketChainNames');
 
     // app & middleware setup
     const app = express();
     app.set('view engine', 'ejs');
     app.set('views', './views');
+
+    app.use(bodyParser.json()); // for parsing application/json
+    app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
     app.use(function(req, res, next) {
         console.log(`${req.method} request for '${req.url}'`);
