@@ -95,7 +95,7 @@
     background-color: none;
     text-align: center;
     /*font-family: 'Ubuntu', sans-serif; */
-    border-spacing: 1px;
+    border-spacing: 0px;
 }
 
 #main-table tr td .avatar-container {
@@ -114,9 +114,6 @@
 #main-table tr td:first-child {
     background-color: #F4FFF8; /* F4FFF8 */
     color: black;
-    border-left: 2px solid #1D1E2C;
-    border-right: 2px solid #1D1E2C;
-    border-bottom: 2px solid #1D1E2C;
 }
 #main-table tr td a{
     color: inherit;
@@ -127,17 +124,20 @@
     text-decoration: none;
 }
 #main-table tr td{
+
     position: relative;
     /*background-color: #606060*/;
     padding: 10px 4px;
     background-color: black;
-    border-bottom: 2.5px solid #1D1E2C;
+
 }
 
 #main-table tr td:last-child {
+    /*
     border-left: 2px solid #1D1E2C;
     border-right: 2px solid #1D1E2C;
-    border-bottom: 2.5px solid #1D1E2C;
+    border-bottom: 2px solid #1D1E2C;
+    */
 }
 .market-header {
     /*font-family: 'Ubuntu', sans-serif; */
@@ -162,11 +162,20 @@
     background-color: #FFFC82 !important;
 }
 
+#main-table tr .market {
+    font-family: 'Source Sans Pro', sans-serif;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
 #main-table tr .left {
     font-family: 'Source Sans Pro', sans-serif;
     font-weight: 400;
     color: #413F68;
     background-color: #F4FFF8; /* !important; */
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
 }
 
 #main-table tr .right {
@@ -174,6 +183,8 @@
     color: #413F68;
     font-weight: 400;
     background-color: #F4FFF8; /* !important; */
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
 }
 
 /* td properties
