@@ -15,24 +15,22 @@ AWS.config.update({
 //var sns = new AWS.SNS();
 //var snsTopic =  process.env.NEW_SIGNUP_TOPIC;
 
-var ddb = new AWS.DynamoDB();
-var ddbTable = 'MarketChainNames';
-
-
+const ddb = new AWS.DynamoDB();
+const docClient = new AWS.DynamoDB.DocumentClient();
+const ddbTable = 'MarketChainNames';
 
 
 // background
 router.post('/putvalidmarket', function(req, res) {
 
     var params = {
-        TableName: 'MarketChainNames',
+        TableName: ddbTable,
         Item: {
             "MarketChainName": { "S": req.body.MarketChainName },
             "MarketLeftName": { "S": req.body.MarketLeftName },
             "MarketRightName": { "S": req.body.MarketRightName }
         }
     }
-
 
     ddb.putItem(params, function(err, data) {
         if (err) {
@@ -43,20 +41,51 @@ router.post('/putvalidmarket', function(req, res) {
     });
 });
 
-router.get('/getvalidmarketnames', function(req, res) {
+router.get('/getmarketnames/:marketchainname', function(req, res) {
+    console.error("HERE! " + req.params.marketchainname);
     var params = {
         TableName: ddbTable,
         Key: {
-            "MarketChainName": { "S": "BTC_XXX_ETH" }
-        },
-        Item: {
-            "MarketLeftName": { "S": "BTC_XXX_ETH_BTC" },
-            "MarketRightName": { "S": "BTC_ETH_XXX_BTC" },
-            "Supported": { "BOOL": true }
+            MarketChainName: req.params.marketchainname
         }
     }
 
+    docClient.get(params, function(err, data) {
+        if (err) {
+            console.error("Unable to read item. Error JSON: ", JSON.stringify(err, null, 2));
+        } else {
+            console.log("Got market names successfully!");
+            res.json(data);
+        }
+    });
+});
 
+router.get('/getvalidmarketnames', function(req, res) {
+    var params = {
+        TableName: ddbTable,
+        ProjectionExpression: "MarketChainName"
+    }
+
+    docClient.scan(params, onScan);
+
+    function onScan(err, data) {
+        if (err) {
+            console.error("Unable to scan the MarketChainNames table. Error JSON: ", JSON.stringify(err, null, 2));
+        } else {
+            // print all the movies
+            console.log("MarketChainNames scan succeeded.");
+
+            // continue scanning if we have more movies, because
+            // scan can retrieve a maximum of 1MB of data
+            if (typeof data.LastEvaluatedKey != "undefined") {
+                console.log("Scanning MarketChainNames for more...");
+                params.ExclusiveStartKey = data.LastEvaluatedKey;
+                docClient.scan(params, onScan);
+            }
+
+            res.json(data);
+        }
+    }
 });
 
 module.exports = router;

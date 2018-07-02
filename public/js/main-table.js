@@ -60,12 +60,40 @@ var highlightedMarkets = {};
 
  $(document).ready(function() {
      initialize();
-
+     getMarketNamesForMarket("BTC_ADA_ETH");
+     getAllValidMarketNames();
      setInterval(function() {
          update();
      }, 1000);
 
  });
+
+
+function getMarketNamesForMarket(name) {
+    $.ajax({
+        url: '/getmarketnames/' + name,
+        async: true,
+        success: (function(data) {
+            console.log("Got All Market Chain Names! ");
+            console.log("Chain name: " + data.Item.MarketChainName + " - " + data.Item.MarketLeftName + " - " + data.Item.MarketRightName);
+
+        })
+    });
+}
+
+function getAllValidMarketNames() {
+    $.ajax({
+        url: '/getvalidmarketnames',
+        async: true,
+        dataType: 'json',
+        success: (function(data) {
+            console.log("Got All Market Chain Names!");
+            data.Items.forEach(function(item) {
+                console.log(" -", item.MarketChainName);
+            });
+        })
+    });
+}
 
  function postValidMarket(marketData) {
 
@@ -125,18 +153,6 @@ var highlightedMarkets = {};
 
              // make reference to a deep copy
              previousMarkets = currentMarkets.slice(0);
-
-             //TODO: delet this
-             for (var i = 0; i < markets.length; i ++) {
-                 var market = markets[i];
-                 postValidMarket({
-                     MarketChainName: market.name,
-                     MarketLeftName: market.leftname,
-                     MarketRightName: market.rightname
-                 });
-
-             }
-             // end delete
          })
      });
  }
