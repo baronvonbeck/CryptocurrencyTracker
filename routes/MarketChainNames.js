@@ -2,27 +2,25 @@
 const router = require('express').Router();
 const request = require('request');
 const fs = require('fs');
+const AWS = require('aws-sdk');
+const bodyParser = require('body-parser');
 
-
-var AWS = require('aws-sdk');
-var bodyParser = require('body-parser');
+const ddb = new AWS.DynamoDB();
 
 AWS.config.update({
   region: "us-west-2",
   endpoint: "http://localhost:8000"
 });
 
-//var sns = new AWS.SNS();
-//var snsTopic =  process.env.NEW_SIGNUP_TOPIC;
 
-const ddb = new AWS.DynamoDB();
-const docClient = new AWS.DynamoDB.DocumentClient();
 const ddbTable = 'MarketChainNames';
+const PUT_VALID_MARKET = '/putvalidmarket';
+const GET_MARKET_NAMES = '/getmarketnames/:marketchainname';
+const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
 
 
-// background
-router.post('/putvalidmarket', function(req, res) {
-
+// Posts a valid market and its corresponding left and right names into dynamoDB
+router.post(PUT_VALID_MARKET, function(req, res) {
     var params = {
         TableName: ddbTable,
         Item: {
@@ -34,58 +32,62 @@ router.post('/putvalidmarket', function(req, res) {
 
     ddb.putItem(params, function(err, data) {
         if (err) {
-            console.log("Error inserting market chain name: " + err );
+            console.log("Error while inserting market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
         } else {
-            console.log("Successfully inserted market chain name: " + data.MarketChainName);
+            console.log("Successfully inserted market chain name: " + req.body.MarketChainName);
         }
     });
 });
 
-router.get('/getmarketnames/:marketchainname', function(req, res) {
-    console.error("HERE! " + req.params.marketchainname);
+
+// Gets the market name, the left market name, and the right market name for an individual market for use for displaying on graphs
+router.get(GET_MARKET_NAMES, function(req, res) {
     var params = {
         TableName: ddbTable,
         Key: {
-            MarketChainName: req.params.marketchainname
+            "MarketChainName": { "S": req.params.marketchainname }
         }
     }
 
-    docClient.get(params, function(err, data) {
+    ddb.getItem(params, function(err, data) {
         if (err) {
-            console.error("Unable to read item. Error JSON: ", JSON.stringify(err, null, 2));
+            console.log("Unable to read market names for market. Error JSON: ", JSON.stringify(err, null, 2));
         } else {
-            console.log("Got market names successfully!");
+            console.log("Got market names for " + req.params.marketchainname + " successfully");
+
             res.json(data);
         }
     });
 });
 
-router.get('/getvalidmarketnames', function(req, res) {
+
+// Gets all of the valid market names we collect data on graphs for. This list is updated on the back end periodically and automatically
+router.get(GET_ALL_VALID_MARKET_NAMES, function(req, res) {
     var params = {
         TableName: ddbTable,
         ProjectionExpression: "MarketChainName"
     }
 
-    docClient.scan(params, onScan);
+    ddb.scan(params, onScan);
 
     function onScan(err, data) {
         if (err) {
-            console.error("Unable to scan the MarketChainNames table. Error JSON: ", JSON.stringify(err, null, 2));
+            console.error("Unable to scan the MarketChainNames table for all valid markets. Error JSON: ", JSON.stringify(err, null, 2));
         } else {
-            // print all the movies
             console.log("MarketChainNames scan succeeded.");
 
-            // continue scanning if we have more movies, because
+            // continue scanning if there are more markets, because
             // scan can retrieve a maximum of 1MB of data
             if (typeof data.LastEvaluatedKey != "undefined") {
                 console.log("Scanning MarketChainNames for more...");
                 params.ExclusiveStartKey = data.LastEvaluatedKey;
-                docClient.scan(params, onScan);
+                ddb.scan(params, onScan);
             }
 
             res.json(data);
         }
     }
 });
+
 
 module.exports = router;

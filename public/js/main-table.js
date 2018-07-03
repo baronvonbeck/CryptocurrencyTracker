@@ -53,15 +53,25 @@ var paused = false;
 
 // (1.00 - 0.0025) ^ 3
 // representing the remaining balance after three trades through a chain loop
-var fee = 0.992518734375;
+const fee = 0.992518734375;
 
 // maintain track of what rows are highlighted in the main table
 var highlightedMarkets = {};
 
+// Routes - MarketChainNames
+const PUT_VALID_MARKET = '/putvalidmarket';
+const GET_MARKET_NAMES = '/getmarketnames/';
+const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
+
+// Routes - Bittrex
+const MARKET_SUMMARIES = '/marketsummaries';
+
+// Routes - MarketChainData
+
+
 $(document).ready(function() {
      initialize();
-     getMarketNamesForMarket("BTC_ADA_ETH");
-     getAllValidMarketNames();
+
      setInterval(function() {
          update();
      }, 1000);
@@ -71,35 +81,35 @@ $(document).ready(function() {
 
 function getMarketNamesForMarket(name) {
     $.ajax({
-        url: '/getmarketnames/' + name,
+        url: GET_MARKET_NAMES + name,
         async: true,
         success: (function(data) {
-            console.log("Got All Market Chain Names! ");
-            console.log("Chain name: " + data.Item.MarketChainName + " - " + data.Item.MarketLeftName + " - " + data.Item.MarketRightName);
+            console.log("Got chain name: " + data.Item.MarketChainName.S + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
 
         })
     });
 }
 
+
 function getAllValidMarketNames() {
     $.ajax({
-        url: '/getvalidmarketnames',
+        url: GET_ALL_VALID_MARKET_NAMES,
         async: true,
         dataType: 'json',
         success: (function(data) {
-            console.log("Got All Market Chain Names!");
+            console.log("Got all Market Chain Names");
             data.Items.forEach(function(item) {
-                console.log(" -", item.MarketChainName);
+                console.log(" -", item.MarketChainName.S);
             });
         })
     });
 }
 
-function postValidMarket(marketData) {
 
+function postValidMarket(marketData) {
      $.ajax({
          type: 'POST',
-         url: '/putvalidmarket',
+         url: PUT_VALID_MARKET,
          async: true,
          data: JSON.stringify(marketData),
          dataType: 'json',
@@ -116,7 +126,7 @@ function initialize() {
      // Bittrex API: get summary of all market exchanges
      // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
      $.ajax({
-         url: '/marketsummaries',
+         url: MARKET_SUMMARIES,
          success: (function (data) {
              if (data.result === null ) {
                  console.log("Failed 'getMarketSummaries()'");
@@ -153,6 +163,7 @@ function initialize() {
 
              // make reference to a deep copy
              previousMarkets = currentMarkets.slice(0);
+
          })
      });
 }
@@ -160,7 +171,7 @@ function initialize() {
 
 function update() {
      $.ajax({
-         url: '/marketsummaries',
+         url: MARKET_SUMMARIES,
          success: (function (data) {
              if (data.result === null) {
                  console.log("Failed 'getMarketSummaries()'");
