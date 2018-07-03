@@ -58,7 +58,7 @@ var fee = 0.992518734375;
 // maintain track of what rows are highlighted in the main table
 var highlightedMarkets = {};
 
- $(document).ready(function() {
+$(document).ready(function() {
      initialize();
      getMarketNamesForMarket("BTC_ADA_ETH");
      getAllValidMarketNames();
@@ -66,7 +66,7 @@ var highlightedMarkets = {};
          update();
      }, 1000);
 
- });
+});
 
 
 function getMarketNamesForMarket(name) {
@@ -95,7 +95,7 @@ function getAllValidMarketNames() {
     });
 }
 
- function postValidMarket(marketData) {
+function postValidMarket(marketData) {
 
      $.ajax({
          type: 'POST',
@@ -108,10 +108,10 @@ function getAllValidMarketNames() {
              console.log("Return succsessful!");
          })
      });
- }
+}
 
 
- function initialize() {
+function initialize() {
 
      // Bittrex API: get summary of all market exchanges
      // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
@@ -155,10 +155,10 @@ function getAllValidMarketNames() {
              previousMarkets = currentMarkets.slice(0);
          })
      });
- }
+}
 
 
- function update() {
+function update() {
      $.ajax({
          url: '/marketsummaries',
          success: (function (data) {
@@ -208,13 +208,13 @@ function getAllValidMarketNames() {
              previousMarkets = currentMarkets.slice(0);
          })
      });
- }
+}
 
 
  /*
   * Get all possible market conversions between 2 different currencies
   */
- function getValidMarketConversions(reference) {
+function getValidMarketConversions(reference) {
      // iterate through markets and put them each into an array
      for (var i = 0; i < reference.length; i ++) {
 
@@ -224,7 +224,7 @@ function getAllValidMarketNames() {
 
          marketSummaries[reference[i].MarketName] = reference[i];
      }
- }
+}
 
 
 /*
@@ -359,12 +359,12 @@ function activateSortDropdownCallback() {
 /*****************************************************************************
  * Sorting Comparator Functions ----- START ------
  *****************************************************************************/
- function aToZ(x, y) {
+function aToZ(x, y) {
      var xlower = x.name.toLowerCase();
      var ylower = y.name.toLowerCase();
 
      return xlower < ylower ? -1 : xlower > ylower ? 1 : 0;
- }
+}
 
 
 function zToA(x, y) {

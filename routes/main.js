@@ -13,8 +13,18 @@ router.get('/', (req, res) => {
 router.get('/about', (req, res) => {
     res.render('about');
 });
+
 router.get('/contact', (req, res) => {
     res.render('contact');
+});
+
+router.get('/graphs', (req,res) => {
+    res.render('graphs.ejs');
+});
+
+router.get('/g/:market.:left.:right', (req, res) => {
+    //res.send(req.params)
+    res.render('graph.ejs', req.params);
 });
 
 // Get available markets
