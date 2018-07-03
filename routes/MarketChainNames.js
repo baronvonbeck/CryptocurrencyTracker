@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 const ddb = new AWS.DynamoDB();
 
+
 AWS.config.update({
   region: "us-west-2",
   endpoint: "http://localhost:8000"

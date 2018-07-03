@@ -67,6 +67,8 @@ const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
 const MARKET_SUMMARIES = '/marketsummaries';
 
 // Routes - MarketChainData
+const PUT_DATA_FOR_MARKET = '/putdataformarket';
+const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/';
 
 
 $(document).ready(function() {
@@ -77,6 +79,33 @@ $(document).ready(function() {
      }, 1000);
 
 });
+
+
+function postMarketData(marketData) {
+     $.ajax({
+         type: 'POST',
+         url: PUT_DATA_FOR_MARKET,
+         async: true,
+         data: JSON.stringify(marketData),
+         dataType: 'json',
+         contentType: "application/json",
+         success: (function(data) {
+             console.log("Return succsessful for data post for: " + marketData.MarketChainName);
+         })
+     });
+}
+
+
+function getMarketDataForMarketInRange(marketData) {
+    $.ajax({
+        url: GET_DATA_FOR_MARKET_IN_RANGE + ":" + marketData.marketname + ".:" + marketData.start + ".:" + marketData.end,
+        async: true,
+        success: (function(data) {
+            console.log("Got chain name: " + data.Item.MarketChainName.S + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
+
+        })
+    });
+}
 
 
 function getMarketNamesForMarket(name) {
@@ -105,7 +134,7 @@ function getAllValidMarketNames() {
     });
 }
 
-
+//TODO: Test again
 function postValidMarket(marketData) {
      $.ajax({
          type: 'POST',
@@ -115,7 +144,7 @@ function postValidMarket(marketData) {
          dataType: 'json',
          contentType: "application/json",
          success: (function(data) {
-             console.log("Return succsessful!");
+             console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
          })
      });
 }
@@ -299,6 +328,7 @@ function findValidConversionChains() {
  * parts of a market. See definition of "left" and "right" above
  */
 function calculateMarketValues() {
+
     for (var i = 0; i < markets.length; i ++) {
         var market = markets[i];
 
@@ -308,6 +338,13 @@ function calculateMarketValues() {
         market.right =  conversions[market.a][market.b] *
                         conversions[market.b][market.c] *
                         conversions[market.c][market.a] * fee;
+
+        postMarketData({
+            MarketChainName: market.name,
+            LeftVal: market.left,
+            RightVal: market.right,
+            DataTimestamp: Date.now()
+        });
     }
 }
 
