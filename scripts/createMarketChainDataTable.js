@@ -18,8 +18,8 @@ var params = {
         { AttributeName: "DataTimestamp", AttributeType: "S" }
     ],
     ProvisionedThroughput: {
-        ReadCapacityUnits: 10,
-        WriteCapacityUnits: 20
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 10
     }
 };
 

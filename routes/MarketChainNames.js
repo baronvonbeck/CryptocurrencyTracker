@@ -5,15 +5,14 @@ const fs = require('fs');
 const AWS = require('aws-sdk');
 const bodyParser = require('body-parser');
 
-const ddb = new AWS.DynamoDB();
-
 
 AWS.config.update({
-  region: "us-west-2",
-  endpoint: "http://localhost:8000"
+    endpoint: "http://localhost:8000",
+    region: "us-west-2"
 });
 
 
+const ddb = new AWS.DynamoDB();
 const ddbTable = 'MarketChainNames';
 const PUT_VALID_MARKET = '/putvalidmarket';
 const GET_MARKET_NAMES = '/getmarketnames/:marketchainname';
@@ -34,10 +33,13 @@ router.post(PUT_VALID_MARKET, function(req, res) {
     ddb.putItem(params, function(err, data) {
         if (err) {
             console.log("Error while inserting market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
-        } else {
+        }
+        else {
             console.log("Successfully inserted market chain name: " + req.body.MarketChainName);
         }
     });
+
+    res.end();
 });
 
 
@@ -52,8 +54,9 @@ router.get(GET_MARKET_NAMES, function(req, res) {
 
     ddb.getItem(params, function(err, data) {
         if (err) {
-            console.log("Unable to read market names for market. Error JSON: ", JSON.stringify(err, null, 2));
-        } else {
+            console.log("Unable to scan market names for market. Error JSON: ", JSON.stringify(err, null, 2));
+        }
+        else {
             console.log("Got market names for " + req.params.marketchainname + " successfully");
 
             res.json(data);
@@ -74,8 +77,9 @@ router.get(GET_ALL_VALID_MARKET_NAMES, function(req, res) {
     function onScan(err, data) {
         if (err) {
             console.error("Unable to scan the MarketChainNames table for all valid markets. Error JSON: ", JSON.stringify(err, null, 2));
-        } else {
-            console.log("MarketChainNames scan succeeded.");
+        }
+        else {
+            console.log("MarketChainNames scan for all names succeeded.");
 
             // continue scanning if there are more markets, because
             // scan can retrieve a maximum of 1MB of data

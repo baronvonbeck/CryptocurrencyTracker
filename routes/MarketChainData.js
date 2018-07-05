@@ -5,16 +5,18 @@ const fs = require('fs');
 var AWS = require('aws-sdk');
 var bodyParser = require('body-parser');
 
+
 AWS.config.update({
-    region: "us-west-2",
-    endpoint: "http://localhost:8000"
+    endpoint: "http://localhost:8000",
+    region: "us-west-2"
 });
 
 
-var ddb = new AWS.DynamoDB();
-var ddbTable = 'MarketChainData';
+const ddb = new AWS.DynamoDB();
+const ddbTable = 'MarketChainData';
 const PUT_DATA_FOR_MARKET = '/putdataformarket';
 const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/:marketchainname.:start.:end';
+
 
 // Posts the data for a given market at a given timestamp
 router.post(PUT_DATA_FOR_MARKET, function(req, res) {
@@ -24,45 +26,44 @@ router.post(PUT_DATA_FOR_MARKET, function(req, res) {
             "MarketChainName": { "S": req.body.MarketChainName },
             "LeftVal": { "N": req.body.RightVal.toString() },
             "RightVal": { "N": req.body.LeftVal.toString() },
-            "DataTimestamp": { "S": req.body.DataTimestamp.toString() },
+            "DataTimestamp": { "S": req.body.DataTimestamp.toString() }
         }
     }
 
     ddb.putItem(params, function(err, data) {
         if (err) {
             console.log("Error while inserting data for market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
-        } else {
+        }
+        else {
             console.log("Successfully inserted market chain data for: " + req.body.MarketChainName);
         }
     });
+
+    res.end();
 });
 
 
 // signup
 router.get(GET_DATA_FOR_MARKET_IN_RANGE, function(req, res) {
-    var item = {
-        'email': {'S': req.body.email},
-        'name': {'S': req.body.name},
-        'preview': {'S': req.body.previewAccess},
-        'theme': {'S': req.body.theme}
-    };
+    var params = {
+        TableName: ddbTable,
+        ProjectionExpression: "MarketChainName, LeftVal, RightVal, DataTimestamp",
+        KeyConditionExpression: "MarketChainName = :mcn and DataTimestamp between :starttime and :endtime",
+        ExpressionAttributeValues: {
+            ":mcn": req.params.marketchainname,
+            ":starttime": req.params.start.toString(),
+            ":endtime": req.params.end.toString()
+        }
+    }
 
-    ddb.putItem({
-        'TableName': ddbTable,
-        'Item': item,
-        'Expected': { email: { Exists: false } }
-    }, function(err, data) {
+    ddb.query(params, function(err, data) {
         if (err) {
-            var returnStatus = 500;
+            console.log("Unable to query market data for market " + req.params.marketchainname + ". Error JSON: ", JSON.stringify(err, null, 2));
+        }
+        else {
+            console.log("MarketChainData query for " + req.params.marketchainname + " succeeded.");
 
-            if (err.code === 'ConditionalCheckFailedException') {
-                returnStatus = 409;
-            }
-
-            res.status(returnStatus).end();
-            console.log('DDB Error: ' + err);
-        } else {
-
+            res.json(data);
         }
     });
 });

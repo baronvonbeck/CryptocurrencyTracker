@@ -16,7 +16,7 @@ var params = {
         { AttributeName: "MarketChainName", AttributeType: "S" }
     ],
     ProvisionedThroughput: {
-        ReadCapacityUnits: 10,
+        ReadCapacityUnits: 5,
         WriteCapacityUnits: 10
     }
 };

@@ -74,10 +74,15 @@ const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/';
 $(document).ready(function() {
      initialize();
 
+     getMarketDataForMarketInRange({
+         "marketname": "BTC_ADA_ETH",
+         "start": "1530764574203",
+         end: Date.now()
+     });
+
      setInterval(function() {
          update();
-     }, 1000);
-
+     }, 2000);
 });
 
 
@@ -96,13 +101,15 @@ function postMarketData(marketData) {
 }
 
 
+//TODO: get this working
 function getMarketDataForMarketInRange(marketData) {
     $.ajax({
         url: GET_DATA_FOR_MARKET_IN_RANGE + ":" + marketData.marketname + ".:" + marketData.start + ".:" + marketData.end,
         async: true,
         success: (function(data) {
-            console.log("Got chain name: " + data.Item.MarketChainName.S + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
-
+            data.Items.forEach(function(item) {
+                console.log("Got chain name: " + item.MarketChainName.S + " - " + item.LeftVal.N + " - " + item.RightVal.N + " - " + item.DataTimestamp.S);
+            });
         })
     });
 }
@@ -134,8 +141,8 @@ function getAllValidMarketNames() {
     });
 }
 
-//TODO: Test again
-function postValidMarket(marketData) {
+
+function putValidMarket(marketData) {
      $.ajax({
          type: 'POST',
          url: PUT_VALID_MARKET,
@@ -192,7 +199,6 @@ function initialize() {
 
              // make reference to a deep copy
              previousMarkets = currentMarkets.slice(0);
-
          })
      });
 }
@@ -338,13 +344,6 @@ function calculateMarketValues() {
         market.right =  conversions[market.a][market.b] *
                         conversions[market.b][market.c] *
                         conversions[market.c][market.a] * fee;
-
-        postMarketData({
-            MarketChainName: market.name,
-            LeftVal: market.left,
-            RightVal: market.right,
-            DataTimestamp: Date.now()
-        });
     }
 }
 
