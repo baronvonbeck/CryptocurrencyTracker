@@ -14,12 +14,12 @@ AWS.config.update({
 
 const ddb = new AWS.DynamoDB();
 const ddbTable = 'MarketChainData';
-const PUT_DATA_FOR_MARKET = '/putdataformarket';
+const POST_DATA_FOR_MARKET = '/putdataformarket';
 const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/:marketchainname.:start.:end';
 
 
 // Posts the data for a given market at a given timestamp
-router.post(PUT_DATA_FOR_MARKET, function(req, res) {
+router.post(POST_DATA_FOR_MARKET, function(req, res) {
     var params = {
         TableName: ddbTable,
         Item: {
@@ -43,18 +43,21 @@ router.post(PUT_DATA_FOR_MARKET, function(req, res) {
 });
 
 
-// signup
+// Gets the data for a given market between the times starttime and endtime
 router.get(GET_DATA_FOR_MARKET_IN_RANGE, function(req, res) {
+    // between is inclusive
     var params = {
         TableName: ddbTable,
         ProjectionExpression: "MarketChainName, LeftVal, RightVal, DataTimestamp",
         KeyConditionExpression: "MarketChainName = :mcn and DataTimestamp between :starttime and :endtime",
         ExpressionAttributeValues: {
-            ":mcn": req.params.marketchainname,
-            ":starttime": req.params.start.toString(),
-            ":endtime": req.params.end.toString()
+            ":mcn": { "S": req.params.marketchainname },
+            ":starttime": { "S": req.params.start.toString() },
+            ":endtime": { "S": req.params.end.toString() }
         }
     }
+
+    console.log(JSON.stringify(params));
 
     ddb.query(params, function(err, data) {
         if (err) {

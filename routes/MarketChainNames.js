@@ -14,13 +14,13 @@ AWS.config.update({
 
 const ddb = new AWS.DynamoDB();
 const ddbTable = 'MarketChainNames';
-const PUT_VALID_MARKET = '/putvalidmarket';
+const POST_VALID_MARKET = '/putvalidmarket';
 const GET_MARKET_NAMES = '/getmarketnames/:marketchainname';
 const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
 
 
 // Posts a valid market and its corresponding left and right names into dynamoDB
-router.post(PUT_VALID_MARKET, function(req, res) {
+router.post(POST_VALID_MARKET, function(req, res) {
     var params = {
         TableName: ddbTable,
         Item: {

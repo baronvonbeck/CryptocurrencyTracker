@@ -59,7 +59,7 @@ const fee = 0.992518734375;
 var highlightedMarkets = {};
 
 // Routes - MarketChainNames
-const PUT_VALID_MARKET = '/putvalidmarket';
+const POST_VALID_MARKET = '/putvalidmarket';
 const GET_MARKET_NAMES = '/getmarketnames/';
 const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
 
@@ -67,18 +67,12 @@ const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
 const MARKET_SUMMARIES = '/marketsummaries';
 
 // Routes - MarketChainData
-const PUT_DATA_FOR_MARKET = '/putdataformarket';
+const POST_DATA_FOR_MARKET = '/putdataformarket';
 const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/';
 
 
 $(document).ready(function() {
      initialize();
-
-     getMarketDataForMarketInRange({
-         "marketname": "BTC_ADA_ETH",
-         "start": "1530764574203",
-         end: Date.now()
-     });
 
      setInterval(function() {
          update();
@@ -86,10 +80,11 @@ $(document).ready(function() {
 });
 
 
+// Posts the data for a given market at a given timestamp
 function postMarketData(marketData) {
      $.ajax({
          type: 'POST',
-         url: PUT_DATA_FOR_MARKET,
+         url: POST_DATA_FOR_MARKET,
          async: true,
          data: JSON.stringify(marketData),
          dataType: 'json',
@@ -101,12 +96,13 @@ function postMarketData(marketData) {
 }
 
 
-//TODO: get this working
+// Gets the data for a given market between the times starttime and endtime
 function getMarketDataForMarketInRange(marketData) {
     $.ajax({
-        url: GET_DATA_FOR_MARKET_IN_RANGE + ":" + marketData.marketname + ".:" + marketData.start + ".:" + marketData.end,
+        url: GET_DATA_FOR_MARKET_IN_RANGE + marketData.marketname + "." + marketData.start + "." + marketData.end,
         async: true,
         success: (function(data) {
+            console.log(data);
             data.Items.forEach(function(item) {
                 console.log("Got chain name: " + item.MarketChainName.S + " - " + item.LeftVal.N + " - " + item.RightVal.N + " - " + item.DataTimestamp.S);
             });
@@ -115,6 +111,7 @@ function getMarketDataForMarketInRange(marketData) {
 }
 
 
+// Gets all of the valid market names we collect data on graphs for. This list is updated on the back end periodically and automatically
 function getMarketNamesForMarket(name) {
     $.ajax({
         url: GET_MARKET_NAMES + name,
@@ -127,6 +124,7 @@ function getMarketNamesForMarket(name) {
 }
 
 
+// Gets the market name, the left market name, and the right market name for an individual market for use for displaying on graphs
 function getAllValidMarketNames() {
     $.ajax({
         url: GET_ALL_VALID_MARKET_NAMES,
@@ -142,10 +140,11 @@ function getAllValidMarketNames() {
 }
 
 
-function putValidMarket(marketData) {
+// Posts a valid market and its corresponding left and right names into dynamoDB
+function postValidMarket(marketData) {
      $.ajax({
          type: 'POST',
-         url: PUT_VALID_MARKET,
+         url: POST_VALID_MARKET,
          async: true,
          data: JSON.stringify(marketData),
          dataType: 'json',
