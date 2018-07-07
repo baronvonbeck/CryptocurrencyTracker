@@ -230,14 +230,25 @@ function update() {
 
                  $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
 
-                 $(selectID).html(
-                     '<div class="avatar-container">' +
+                var mVal = 0;
+                for(var j = 0; j < markets.length; j ++) {
+                    if(markets[j] === currentMarkets[i]){
+                        mVal = j;
+                    }
+                }
+                var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
+                var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
+
+
+                $(selectID).html(
+                    '<div class="avatar-container">' +
+                   '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '</div>' +
-                     "<a href=#" + market.name + ">" + market.name + "</a>"
-                 );
+                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                    '</div>' +
+                    "<a href=/g/" + market.name + "." + lName + "." + rName + ">" + market.name + "</a>"
+                );
+                
                  $(selectIDLeft).html(
                      market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font>'
                  );
