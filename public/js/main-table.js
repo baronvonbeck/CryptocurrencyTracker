@@ -10,6 +10,9 @@
  *          Right: AAA->BBB->CCC->AAA
  */
 
+// Refresh rate
+const REFRESH = 2000;
+
 // main associative array to hold data per market name (e.g. "BTC-LTC")
 var marketSummaries = {};
 
@@ -21,7 +24,7 @@ var conversions = {};
  * Markets the user can start and end on. These are the only ones currently
  * supported in conjunction with many others via Bittrex's API
  */
-var validMarkets =  {
+const validMarkets =  {
     "BTC"   : true,
     "ETH"   : true,
     "USDT"  : true,
@@ -37,7 +40,7 @@ var previousMarkets = [];
 var selectedSortMethod = 2;
 
 // array of supported sorting methods
-var sortMethods = [
+const sortMethods = [
     aToZ,
     zToA,
     descending,
@@ -58,17 +61,9 @@ const fee = 0.992518734375;
 // maintain track of what rows are highlighted in the main table
 var highlightedMarkets = {};
 
-// Routes - MarketChainNames
-const POST_VALID_MARKET = '/putvalidmarket';
-const GET_MARKET_NAMES = '/getmarketnames/';
-const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
-
 // Routes - Bittrex
 const MARKET_SUMMARIES = '/marketsummaries';
 
-// Routes - MarketChainData
-const POST_DATA_FOR_MARKET = '/putdataformarket';
-const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/';
 
 
 $(document).ready(function() {
@@ -76,86 +71,11 @@ $(document).ready(function() {
 
      setInterval(function() {
          update();
-     }, 2000);
+     }, REFRESH);
 });
 
 
-// Posts the data for a given market at a given timestamp
-function postMarketData(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_DATA_FOR_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for data post for: " + marketData.MarketChainName);
-         })
-     });
-}
-
-
-// Gets the data for a given market between the times starttime and endtime
-function getMarketDataForMarketInRange(marketData) {
-    $.ajax({
-        url: GET_DATA_FOR_MARKET_IN_RANGE + marketData.marketname + "." + marketData.start + "." + marketData.end,
-        async: true,
-        success: (function(data) {
-            console.log(data);
-            data.Items.forEach(function(item) {
-                console.log("Got chain name: " + item.MarketChainName.S + " - " + item.LeftVal.N + " - " + item.RightVal.N + " - " + item.DataTimestamp.S);
-            });
-        })
-    });
-}
-
-
-// Gets all of the valid market names we collect data on graphs for. This list is updated on the back end periodically and automatically
-function getMarketNamesForMarket(name) {
-    $.ajax({
-        url: GET_MARKET_NAMES + name,
-        async: true,
-        success: (function(data) {
-            console.log("Got chain name: " + data.Item.MarketChainName.S + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
-
-        })
-    });
-}
-
-
-// Gets the market name, the left market name, and the right market name for an individual market for use for displaying on graphs
-function getAllValidMarketNames() {
-    $.ajax({
-        url: GET_ALL_VALID_MARKET_NAMES,
-        async: true,
-        dataType: 'json',
-        success: (function(data) {
-            console.log("Got all Market Chain Names");
-            data.Items.forEach(function(item) {
-                console.log(" -", item.MarketChainName.S);
-            });
-        })
-    });
-}
-
-
-// Posts a valid market and its corresponding left and right names into dynamoDB
-function postValidMarket(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_VALID_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
-         })
-     });
-}
-
-
+//TODO: Possibly merge initialize and update functions?
 function initialize() {
 
      // Bittrex API: get summary of all market exchanges
@@ -183,6 +103,7 @@ function initialize() {
                  var selectIDRight = i + "-RIGHT";
                  var selectID = i + "-MARKET";
 
+                 //TODO: get a href working here, and corgis appearing
                  $("#main-table").append(
                      '<tr class="trow">' +
                      '<img src="http://placecorgi.com/32/32" class="td-avatar"/>'+
@@ -373,6 +294,7 @@ function sortMarkets(index) {
 /*****************************************************************************
  * Callback Functions ----- START ------
  *****************************************************************************/
+
 /*
  * Callback function for pausing
  */

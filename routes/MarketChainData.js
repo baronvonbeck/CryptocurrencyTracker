@@ -48,13 +48,14 @@ router.get(GET_DATA_FOR_MARKET_IN_RANGE, function(req, res) {
     // between is inclusive
     var params = {
         TableName: ddbTable,
-        ProjectionExpression: "MarketChainName, LeftVal, RightVal, DataTimestamp",
+        ProjectionExpression: "LeftVal, RightVal, DataTimestamp",
         KeyConditionExpression: "MarketChainName = :mcn and DataTimestamp between :starttime and :endtime",
         ExpressionAttributeValues: {
             ":mcn": { "S": req.params.marketchainname },
             ":starttime": { "S": req.params.start.toString() },
             ":endtime": { "S": req.params.end.toString() }
-        }
+        },
+        ScanIndexForward: true
     }
 
     console.log(JSON.stringify(params));
