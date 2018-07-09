@@ -25,18 +25,113 @@ $(document).ready(function() {
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
 	}, REFRESH);
+
+	const width = 960;
+	const height = 480;
+
+	var canvas = d3.select('body')
+		.append('svg')
+		.attr('width', width)
+		.attr('height', height)
+		.attr('id', 'canvas');
+
+	var plotMargins = {
+		top: 30,
+		bottom: 30,
+		left: 150,
+		right: 30
+	};
+
+	var plotGroup = canvas.append('g')
+		.classed('plot', true)
+		.attr('transform', `translate(${plotMargins.left},${plotMargins.top})`);
+
+	var plotWidth = width - plotMargins.left - plotMargins.right;
+	var plotHeight = height - plotMargins.top - plotMargins.bottom;
+
+	// x-axis
+	var xScale = d3.scaleTime().range([0, plotWidth]);
+	var xAxis = d3.axisBottom(xScale);
+	var xAxisGroup = plotGroup.append('g')
+		.classed('x', true)
+		.classed('axis', true)
+		.attr('transform', `translate(${0},${plotHeight})`)
+		.call(xAxis);
+
+	// y-axis
+	var yScale = d3.scaleLinear().range([plotHeight, 0]);
+	var yAxis = d3.axisLeft(yScale);
+	var yAxisGroup = plotGroup.append('g')
+		.classed('y', true)
+		.classed('axis', true)
+		.call(yAxis);
+
+	var pointsGroup = plotGroup.append('g').classed('points', true);
+
+	var myData = [
+	    {
+	    "name": "John",
+	    "age": 30,
+		"score": 50,
+	    "city": "New York"
+	    },
+	    {
+	    "name": "Jane",
+	    "age": 20,
+		"score": 67,
+	    "city": "San Francisco"
+		},
+		{
+	    "name": "Pizza",
+	    "age": 25,
+		"score": 27,
+	    "city": "New York"
+	    },
+	    {
+	    "name": "HotDog",
+	    "age": 10,
+		"score": 98,
+	    "city": "San Francisco"
+	    }
+	];
+
+	xScale.domain(d3.extent(myData, d=> d.age)).nice();
+	xAxisGroup.call(xAxis);
+
+	yScale.domain(d3.extent(myData, d=> d.score)).nice();
+	yAxisGroup.call(yAxis);
+
+	var dataBound = pointsGroup.selectAll('.post').data(myData);
+
+	// Delete extra points
+	dataBound.exit().remove();
+
+	// Add new points
+	var enterSelection = dataBound.enter().append('g').classed('post', true);
+	enterSelection.append('circle').attr('r', 2).style('fill', 'red');
+
+	// Update existing points
+	enterSelection.merge(dataBound)
+		.attr('transform', (d, i) => `translate(${xScale(d.age)},${yScale(d.score)})`)
+
+
+
+
+	d3.select("body").append('p').text("TEST");
+
+
 });
 
 
 
 /*
- * Displays a new market on the graph if 
+ * Displays a new market on the graph if
  *   1. That market is not on the graph yet
  *	 2. There are fewer than MAX_MARKETS
  */
 function displayNewMarketOnGraph(marketName) {
 
-	if (!displayedMarkets.hasOwnProperty(marketName) 
+	if (!displayedMarkets.hasOwnProperty(marketName)
 		&& Object.keys(displayedMarkets).length < MAX_MARKETS) {
 
 		getMarketNamesForMarket(marketName,
@@ -60,7 +155,7 @@ function displayNewMarketOnGraph(marketName) {
 }
 
 
-// Updates all of the currently displayed 
+// Updates all of the currently displayed
 function updateCurrentlyDisplayedGraphs() {
 	Object.keys(displayedMarkets).forEach( function(key) {
 		console.log(marketData[key]);
@@ -100,12 +195,12 @@ function addToDropdown() {
  * Callback Functions ----- START ------
  *****************************************************************************/
 
-/* 
+/*
  * Callback for getting the data for a market
  */
 function getMarketDataForMarketInRangeCallback(data) {
 	var key = Object.keys(data)[0];
-	
+
 	marketData[key] = data[key];
 
 	/*
@@ -118,12 +213,12 @@ function getMarketDataForMarketInRangeCallback(data) {
 }
 
 
-/* 
+/*
  * Callback for appending new market data
  */
 function getMarketDataForMarketInRangeAppendCallback(data) {
 	var key = Object.keys(data)[0];
-	
+
 	marketData[key].push(data[key]);
 
 	// NOT WORKING
@@ -137,7 +232,7 @@ function getMarketDataForMarketInRangeAppendCallback(data) {
 }
 
 
-/* 
+/*
  * Callback for getting the left and right names for a market
  */
 function getMarketNamesForMarketCallback(data) {
