@@ -67,6 +67,7 @@ const MARKET_SUMMARIES = '/marketsummaries';
 
 
 $(document).ready(function() {
+
      initialize();
 
      setInterval(function() {
@@ -125,6 +126,7 @@ function initialize() {
 
 
 function update() {
+
      $.ajax({
          url: MARKET_SUMMARIES,
          success: (function (data) {
@@ -192,6 +194,7 @@ function update() {
   * Get all possible market conversions between 2 different currencies
   */
 function getValidMarketConversions(reference) {
+
      // iterate through markets and put them each into an array
      for (var i = 0; i < reference.length; i ++) {
 
@@ -210,6 +213,7 @@ function getValidMarketConversions(reference) {
  * listed in validMarkets.
  */
 function findValidConversionChains() {
+
     markets = [];
     var exists = {};
 
@@ -283,6 +287,7 @@ function calculateMarketValues() {
  * Sorts using the function in sortMethods at index paramater passed in
  */
 function sortMarkets(index) {
+
     currentMarkets = markets.slice(0);
 
     currentMarkets.sort(function(a, b) {
@@ -299,6 +304,7 @@ function sortMarkets(index) {
  * Callback function for pausing
  */
 function pauseCallback() {
+
     if (paused) $('#pause-button').html("&#10074;&#10074;");
     else $('#pause-button').html("&#9658;");
     paused = !paused;
@@ -309,6 +315,7 @@ function pauseCallback() {
  * Callback function for highlighting clicked rows
  */
 function activateHighlightCallback() {
+
     $('#main-table .trow').click(function() {
         var marketName = $(this).children()[0].innerText;
 
@@ -326,6 +333,7 @@ function activateHighlightCallback() {
  * Callback function for getting sort dropdown value
  */
 function activateSortDropdownCallback() {
+    
     $("#sort-methods").change(function() {
         selectedSortMethod = $(this).val();
     });

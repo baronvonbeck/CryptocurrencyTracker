@@ -1,5 +1,6 @@
 /* graph.js */
 
+
 // Maximum number of displayable graphs
 const MAX_MARKETS = 5;
 
@@ -15,7 +16,9 @@ var displayedMarkets = {};
 // Contains all market data for graphing in D3
 var marketData = {};
 
+
 $(document).ready(function() {
+
 	// add all the market names to the dropdown
 	addMarketNamesToDropdown();
 
@@ -25,6 +28,7 @@ $(document).ready(function() {
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
 	}, REFRESH);
+
 
 	const width = 960;
 	const height = 480;
@@ -118,8 +122,6 @@ $(document).ready(function() {
 
 
 	d3.select("body").append('p').text("TEST");
-
-
 });
 
 
@@ -157,8 +159,9 @@ function displayNewMarketOnGraph(marketName) {
 
 // Updates all of the currently displayed
 function updateCurrentlyDisplayedGraphs() {
+
 	Object.keys(displayedMarkets).forEach( function(key) {
-		console.log(marketData[key]);
+		
 		var marketRange = {
 			"marketname": key,
 			"start": parseInt(marketData[key][marketData[key].length - 1].DataTimestamp) + 1,
@@ -173,6 +176,7 @@ function updateCurrentlyDisplayedGraphs() {
 
 // Removes market from the graph
 function removeMarketFromGraph(marketName) {
+
 	delete displayedMarkets[marketName];
 	delete marketData[marketName];
 
@@ -182,6 +186,7 @@ function removeMarketFromGraph(marketName) {
 
 // Gets all market names and adds them all to the dropdown for the user to select
 function addMarketNamesToDropdown() {
+
 	getAllValidMarketNames(getAllValidMarketNamesCallback);
 }
 
@@ -191,6 +196,65 @@ function addToDropdown() {
 	//TODO: add allMarketNames to the dropdown
 }
 
+
+/*
+ * Makes a hidden market on the graph visible
+ */
+function showMarketOnGraphHandler(marketNameLR) {
+	//TODO: show a market on the graph that has been hidden
+}
+
+
+/*
+ * Makes a visible market on the graph hidden
+ */
+function hideMarketOnGraphHandler(marketNameLR) {
+	//TODO: hide a market on the graph that is visible
+}
+
+
+
+/*****************************************************************************
+ * Handler Functions ----- START ------
+ *****************************************************************************/
+
+/*
+ * Handler for clicking the remove button to remove a market from the graph
+ */
+function removeMarketFromGraphHandler(marketName) {
+	removeMarketFromGraph(marketName);
+}
+
+
+/*
+ * Handler for clicking the add button to add a market to the graph
+ */
+function addNewMarketToGraphHandler(marketName) {
+	displayNewMarketOnGraph(marketName);
+}
+
+
+/*
+ * Handler for showing a hidden market on the graph
+ */
+function showMarketOnGraphHandler(marketNameLR) {
+	showMarketOnGraph(marketNameLR);
+}
+
+
+/*
+ * Handler for hiding a visible market on the graph
+ */
+function hideMarketOnGraphHandler(marketNameLR) {
+	hideMarketOnGraph(marketNameLR);
+}
+
+/*****************************************************************************
+ * Handler Functions ----- END ------
+ *****************************************************************************/
+
+
+
 /*****************************************************************************
  * Callback Functions ----- START ------
  *****************************************************************************/
@@ -199,6 +263,7 @@ function addToDropdown() {
  * Callback for getting the data for a market
  */
 function getMarketDataForMarketInRangeCallback(data) {
+
 	var key = Object.keys(data)[0];
 
 	marketData[key] = data[key];
@@ -217,9 +282,10 @@ function getMarketDataForMarketInRangeCallback(data) {
  * Callback for appending new market data
  */
 function getMarketDataForMarketInRangeAppendCallback(data) {
+
 	var key = Object.keys(data)[0];
 
-	marketData[key].push(data[key]);
+	if (data[key].length > 0) marketData[key].push(data[key]);
 
 	// NOT WORKING
 	/*
@@ -236,9 +302,12 @@ function getMarketDataForMarketInRangeAppendCallback(data) {
  * Callback for getting the left and right names for a market
  */
 function getMarketNamesForMarketCallback(data) {
+
 	displayedMarkets[data.MarketChainName] = {
 		"MarketLeftName": data.MarketLeftName,
-		"MarketRightName": data.MarketRightName
+		"MarketLeftVisible": true,
+		"MarketRightName": data.MarketRightName,
+		"MarketRightVisible": true
 	}
 
 	/*
@@ -251,6 +320,7 @@ function getMarketNamesForMarketCallback(data) {
  *
  */
 function getAllValidMarketNamesCallback(data) {
+
 	allMarketNames = data;
 
 	addToDropdown();
@@ -261,6 +331,7 @@ function getAllValidMarketNamesCallback(data) {
 	});
 	*/
 }
+
 /*****************************************************************************
  * Callback Functions ----- END ------
  *****************************************************************************/
