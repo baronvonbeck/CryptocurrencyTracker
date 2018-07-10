@@ -13,8 +13,26 @@ var allMarketNames = [];
 // Contains graphs currently being displayed
 var displayedMarkets = {};
 
-// Contains all market data for graphing in D3
-var marketData = {};
+// Contains raw graph data for graphing in D3
+var graphData = [];
+
+// Track next available position in graph data
+var graphPos = 0;
+
+// variables for tracking D3 graph
+var colors = [
+	'steelblue',
+	'green',
+	'red',
+	'purple'
+];
+var svg = null;
+var line = null;
+var points = null;
+var x, y, xAxis, yAxis;
+var margin = {top: 20, right: 30, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
 
 $(document).ready(function() {
@@ -22,6 +40,7 @@ $(document).ready(function() {
 	// add all the market names to the dropdown
 	addMarketNamesToDropdown();
 
+	setTimeout(1000);
 	// if there was a graph context, display that graph
 	displayNewMarketOnGraph("BTC_ADA_ETH");
 
@@ -29,101 +48,132 @@ $(document).ready(function() {
 		updateCurrentlyDisplayedGraphs();
 	}, REFRESH);
 
-
-	const width = 960;
-	const height = 480;
-
-	var canvas = d3.select('body')
-		.append('svg')
-		.attr('width', width)
-		.attr('height', height)
-		.attr('id', 'canvas');
-
-	var plotMargins = {
-		top: 30,
-		bottom: 30,
-		left: 150,
-		right: 30
-	};
-
-	var plotGroup = canvas.append('g')
-		.classed('plot', true)
-		.attr('transform', `translate(${plotMargins.left},${plotMargins.top})`);
-
-	var plotWidth = width - plotMargins.left - plotMargins.right;
-	var plotHeight = height - plotMargins.top - plotMargins.bottom;
-
-	// x-axis
-	var xScale = d3.scaleTime().range([0, plotWidth]);
-	var xAxis = d3.axisBottom(xScale);
-	var xAxisGroup = plotGroup.append('g')
-		.classed('x', true)
-		.classed('axis', true)
-		.attr('transform', `translate(${0},${plotHeight})`)
-		.call(xAxis);
-
-	// y-axis
-	var yScale = d3.scaleLinear().range([plotHeight, 0]);
-	var yAxis = d3.axisLeft(yScale);
-	var yAxisGroup = plotGroup.append('g')
-		.classed('y', true)
-		.classed('axis', true)
-		.call(yAxis);
-
-	var pointsGroup = plotGroup.append('g').classed('points', true);
-
-	var myData = [
-	    {
-	    "name": "John",
-	    "age": 30,
-		"score": 50,
-	    "city": "New York"
-	    },
-	    {
-	    "name": "Jane",
-	    "age": 20,
-		"score": 67,
-	    "city": "San Francisco"
-		},
-		{
-	    "name": "Pizza",
-	    "age": 25,
-		"score": 27,
-	    "city": "New York"
-	    },
-	    {
-	    "name": "HotDog",
-	    "age": 10,
-		"score": 98,
-	    "city": "San Francisco"
-	    }
-	];
-
-	xScale.domain(d3.extent(myData, d=> d.age)).nice();
-	xAxisGroup.call(xAxis);
-
-	yScale.domain(d3.extent(myData, d=> d.score)).nice();
-	yAxisGroup.call(yAxis);
-
-	var dataBound = pointsGroup.selectAll('.post').data(myData);
-
-	// Delete extra points
-	dataBound.exit().remove();
-
-	// Add new points
-	var enterSelection = dataBound.enter().append('g').classed('post', true);
-	enterSelection.append('circle').attr('r', 2).style('fill', 'red');
-
-	// Update existing points
-	enterSelection.merge(dataBound)
-		.attr('transform', (d, i) => `translate(${xScale(d.age)},${yScale(d.score)})`)
-
-
-
-
-	d3.select("body").append('p').text("TEST");
 });
 
+
+function createD3SVG() {
+
+	x = d3.time.scale()
+	    .domain([ parseInt(graphData[0][0].x), parseInt(Date.now()) ])
+	    .range([0, width]);
+	 
+	y = d3.scale.linear()
+	    .domain([0.85, 1.05])
+	    .range([height, 0]);
+		
+	xAxis = d3.svg.axis()
+	    .scale(x)
+		.tickSize(-height)
+		.tickPadding(10)	
+		.tickSubdivide(true)	
+	    .orient("bottom");	
+		
+	yAxis = d3.svg.axis()
+	    .scale(y)
+		.tickPadding(10)
+		.tickSize(-width)
+		.tickSubdivide(true)	
+	    .orient("left");
+		
+	var zoom = d3.behavior.zoom()
+	    .x(x)
+	    .y(y)
+	    .scaleExtent([1, 1000])
+	    .on("zoom", zoomed);
+
+
+	svg = d3.select("body").append("svg")
+		.call(zoom)
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+		.append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    //.attr('id', 'canvas');
+	 
+	svg.append("g")
+	    .attr("class", "x axis")
+	    .attr("transform", "translate(0," + height + ")")
+	    .call(xAxis);
+	 
+	svg.append("g")
+	    .attr("class", "y axis")
+	    .call(yAxis);
+	 
+	svg.append("g")
+		.attr("class", "y axis")
+		.append("text")
+		.attr("class", "axis-label")
+		.attr("transform", "rotate(-90)")
+		.attr("y", (-margin.left) + 10)
+		.attr("x", -height/2)
+		.text('Axis Label');	
+	 
+	svg.append("clipPath")
+		.attr("id", "clip")
+		.append("rect")
+		.attr("width", width)
+		.attr("height", height);
+}
+
+
+function createD3LineGraph() {
+	
+	//************************************************************
+	// Create D3 line object and draw data on our SVG object
+	//************************************************************
+	line = d3.svg.line()
+	    .interpolate("linear")	
+	    .x(function(d) { return x(parseInt(d.x)); })
+	    .y(function(d) { return y(d.y); });		
+		
+	svg.selectAll('.line')
+		.data(graphData)
+		.enter()
+		.append("path")
+	    .attr("class", "line")
+		.attr("clip-path", "url(#clip)")
+		.attr('stroke', function(d,i){ 			
+			return colors[i%colors.length];
+		})
+	    .attr("d", line);
+
+
+	//************************************************************
+	// Draw points on SVG object based on the data given
+	//************************************************************
+	points = svg.selectAll('.dots')
+		.data(graphData)
+		.enter()
+		.append("g")
+	    .attr("class", "dots")
+		.attr("clip-path", "url(#clip)");	
+	 
+	points.selectAll('.dot')
+		.data(function(d, index){ 		
+			var a = [];
+			d.forEach(function(point,i){
+				a.push({'index': index, 'point': point});
+			});		
+			return a;
+		})
+		.enter()
+		.append('circle')
+		.attr('class','dot')
+		.attr("r", 2.5)
+		.attr('fill', function(d,i){ 	
+			return colors[d.index%colors.length];
+		})	
+		.attr("transform", function(d) { 
+			return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+		);
+
+}
+
+
+
+function updateD3LineGraph() {
+
+}
 
 
 /*
@@ -141,12 +191,12 @@ function displayNewMarketOnGraph(marketName) {
 
 		var marketRange = {
 			"marketname": marketName,
-			"start": "1530764574204",
-			"end": Date.now()
+			"start": "1530764467248",
+			"end": "1530764584163"
 		};
 		getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 
-		//TODO: add to D3 graphs
+		
 	}
 	else if (!displayedMarkets.hasOwnProperty(marketName)) {
 		//TODO: display error message on page saying marketName has already been graphed
@@ -164,7 +214,7 @@ function updateCurrentlyDisplayedGraphs() {
 		
 		var marketRange = {
 			"marketname": key,
-			"start": parseInt(marketData[key][marketData[key].length - 1].DataTimestamp) + 1,
+			"start": parseInt(displayedMarkets[key].lastTimestamp) + 1,
 			"end": Date.now()
 		};
 		getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeAppendCallback);
@@ -178,8 +228,16 @@ function updateCurrentlyDisplayedGraphs() {
 function removeMarketFromGraph(marketName) {
 
 	delete displayedMarkets[marketName];
-	delete marketData[marketName];
 
+	var decrementPoint = displayedMarkets[marketName].graphDataPosRight;
+
+	delete graphData[displayedMarkets[marketName].graphDataPosLeft];
+	delete graphData[decrementPoint];
+
+	displayedMarkets.forEach( function(item) {
+		if (item.graphDataPosLeft > decrementPoint) item.graphDataPosLeft -= 2;
+		if (item.graphDataPosRight > decrementPoint) item.graphDataPosRight -= 2;
+	});
 	//TODO: remove the market from the D3 graph
 }
 
@@ -249,6 +307,19 @@ function hideMarketOnGraphHandler(marketNameLR) {
 	hideMarketOnGraph(marketNameLR);
 }
 
+/* 
+ * Handler for zooming in and out on the graph
+ */
+function zoomed() {
+	svg.select(".x.axis").call(xAxis);
+	svg.select(".y.axis").call(yAxis);   
+	svg.selectAll('path.line').attr('d', line);  
+ 
+	points.selectAll('circle').attr("transform", function(d) { 
+		return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+	);  
+}
+
 /*****************************************************************************
  * Handler Functions ----- END ------
  *****************************************************************************/
@@ -266,15 +337,35 @@ function getMarketDataForMarketInRangeCallback(data) {
 
 	var key = Object.keys(data)[0];
 
-	marketData[key] = data[key];
+	var left = [];
+	var right = [];
+	
+	var lastT;
 
-	/*
-	console.log(key);
-	marketData[key].forEach(function(item) {
-		console.log(item);
-		console.log("Data " + item.DataTimestamp + "  " + item.LeftVal + "  " + item.RightVal);
+	data[key].forEach(function(item) {
+		left.push({'x': item.DataTimestamp, 'y': item.LeftVal});
+		right.push({'x': item.DataTimestamp, 'y': item.RightVal});
+
+		lastT = item.DataTimestamp;
+
+		// console.log(item);
+		// console.log("Data " + item.DataTimestamp + "  " + item.LeftVal + "  " + item.RightVal);
 	});
-	*/
+
+	displayedMarkets[key].lastTimestamp = lastT;
+	displayedMarkets[key].graphDataPosLeft = graphPos;
+	graphPos += 1;
+	displayedMarkets[key].graphDataPosRight = graphPos;
+	graphPos += 1;
+
+	graphData.push(left);
+	graphData.push(right);
+
+	console.log(graphData);
+
+	if (svg == null) createD3SVG();
+
+	createD3LineGraph();
 }
 
 
@@ -285,16 +376,22 @@ function getMarketDataForMarketInRangeAppendCallback(data) {
 
 	var key = Object.keys(data)[0];
 
-	if (data[key].length > 0) marketData[key].push(data[key]);
+	if (data[key].length > 0) {
 
-	// NOT WORKING
-	/*
-	console.log(key);
-	marketData[key].forEach(function(item) {
-		console.log(item);
-		console.log("Data " + item.DataTimestamp + "  " + item.LeftVal + "  " + item.RightVal);
-	});
-	*/
+		var lastT;
+
+		data[key].forEach(function(item) {
+
+			graphData[displayedMarkets[key].graphDataPosLeft].push({'x': item.DataTimestamp, 'y': item.LeftVal});
+			graphData[displayedMarkets[key].graphDataPosRight].push({'x': item.DataTimestamp, 'y': item.RightVal});
+
+			lastT = item.DataTimestamp;
+		});
+
+		displayedMarkets[key].lastTimestamp = lastT;
+
+		updateD3LineGraph();
+	}
 }
 
 
@@ -307,7 +404,8 @@ function getMarketNamesForMarketCallback(data) {
 		"MarketLeftName": data.MarketLeftName,
 		"MarketLeftVisible": true,
 		"MarketRightName": data.MarketRightName,
-		"MarketRightVisible": true
+		"MarketRightVisible": true,
+		"lastTimestamp": Date.now()
 	}
 
 	/*
