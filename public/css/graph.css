@@ -1,0 +1,23 @@
+@import "style.css";
+@import url('https://fonts.googleapis.com/css?family=Shrikhand');
+
+body {
+    background-color: #F1F1F1;
+}
+
+h1 {
+    font-family: 'Shrikhand', sans-serif;
+    font-weight: lighter;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+#canvas {
+    margin: auto;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 75%;
+    height: auto;
+    border: 1px solid black;
+}
