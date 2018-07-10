@@ -104,11 +104,23 @@ function initialize() {
                  var selectIDRight = i + "-RIGHT";
                  var selectID = i + "-MARKET";
 
-                 //TODO: get a href working here, and corgis appearing
+                 var mVal = 0;
+                 for(var j = 0; j < markets.length; j ++) {
+                     if(markets[j] === currentMarkets[i]){
+                         mVal = j;
+                     }
+                 }
+                 var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
+                 var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
+
                  $("#main-table").append(
                      '<tr class="trow">' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>'+
-                     '<td class="market" id=' + selectID + '>' + market.name + '</td>' +
+
+                     '<td class="market" id=' + selectID + '>' + '<div class="avatar-container">' +
+                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '</div>' +  "<a href=/g/" + market.name + "." + lName + "." + rName + ">" + market.name + "</a>" + '</td>' +
                      '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
                      '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
                      '</tr>'
@@ -171,7 +183,7 @@ function update() {
                     '</div>' +
                     "<a href=/g/" + market.name + "." + lName + "." + rName + ">" + market.name + "</a>"
                 );
-                
+
                  $(selectIDLeft).html(
                      market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font>'
                  );
@@ -333,7 +345,7 @@ function activateHighlightCallback() {
  * Callback function for getting sort dropdown value
  */
 function activateSortDropdownCallback() {
-    
+
     $("#sort-methods").change(function() {
         selectedSortMethod = $(this).val();
     });
