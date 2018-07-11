@@ -40,9 +40,14 @@ $(document).ready(function() {
 	// add all the market names to the dropdown
 	addMarketNamesToDropdown();
 
-	setTimeout(1000);
 	// if there was a graph context, display that graph
-	displayNewMarketOnGraph($("#mname").val());
+	displayNewMarketOnGraph($("#mname").text());
+
+
+	setTimeout(function() {
+		displayNewMarketOnGraph("BTC_ZRX_ETH");
+	}, 5000);
+	
 
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
@@ -51,6 +56,7 @@ $(document).ready(function() {
 });
 
 
+// creates SVG for the D3 line graph
 function createD3SVG() {
 
 	x = d3.time.scale()
@@ -80,7 +86,6 @@ function createD3SVG() {
 	    .y(y)
 	    .scaleExtent([1, 1000])
 	    .on("zoom", zoomed);
-
 
 	svg = d3.select("body").append("svg")
 		.call(zoom)
@@ -116,8 +121,13 @@ function createD3SVG() {
 }
 
 
+// creates the D3 line graph
 function createD3LineGraph() {
 
+	$(".line").remove();
+	$(".dots").remove();
+	$(".dot").remove();
+	
 	//************************************************************
 	// Create D3 line object and draw data on our SVG object
 	//************************************************************
@@ -167,12 +177,60 @@ function createD3LineGraph() {
 			return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
 		);
 
+	svg.select(".x.axis").call(xAxis);
+	svg.select(".y.axis").call(yAxis);
+	svg.selectAll('path.line').attr('d', line);
+	points.selectAll('circle').attr("transform", function(d) {
+		return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+	);
 }
 
 
-
+// updates the line graph upon entry of new data
 function updateD3LineGraph() {
 
+	// line = d3.svg.line()
+	//     .interpolate("linear")
+	//     .x(function(d) { return x(parseInt(d.x)); })
+	//     .y(function(d) { return y(d.y); });
+
+	svg.selectAll('.line')
+		.data(graphData)
+		.enter()
+		.append("path")
+	    .attr("class", "line")
+		.attr("clip-path", "url(#clip)")
+		.attr('stroke', function(d,i){
+			return colors[i%colors.length];
+		})
+	    .attr("d", line);
+
+	points.selectAll('.dot')
+		.data(function(d, index){
+			var a = [];
+			d.forEach(function(point,i){
+				a.push({'index': index, 'point': point});
+			});
+			return a;
+		})
+		.enter()
+		.append('circle')
+		.attr('class','dot')
+		.attr("r", 2.5)
+		.attr('fill', function(d,i){
+			return colors[d.index%colors.length];
+		})
+		.attr("transform", function(d) {
+			return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+		);
+
+	svg.select(".x.axis").call(xAxis);
+	svg.select(".y.axis").call(yAxis);
+
+	svg.selectAll('path.line').attr('d', line);
+	points.selectAll('circle').attr("transform", function(d) {
+		return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+	);
 }
 
 
@@ -183,19 +241,16 @@ function updateD3LineGraph() {
  */
 function displayNewMarketOnGraph(marketName) {
 
+	/*
+	if (allMarketNames.indexOf(marketName) < 0 ) {
+		//TODO: display error message on page saying marketName is invalid
+	}
+	*/
 	if (!displayedMarkets.hasOwnProperty(marketName)
 		&& Object.keys(displayedMarkets).length < MAX_MARKETS) {
 
 		getMarketNamesForMarket(marketName,
 			getMarketNamesForMarketCallback);
-
-		var marketRange = {
-			"marketname": marketName,
-			"start": "1530764467248",
-			"end": "1530764584163"
-		};
-		getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
-
 
 	}
 	else if (!displayedMarkets.hasOwnProperty(marketName)) {
@@ -204,6 +259,7 @@ function displayNewMarketOnGraph(marketName) {
 	else if (Object.keys(displayedMarkets).length < MAX_MARKETS) {
 		//TODO: display error message on graph page saying maximum number of markets is already being displayed
 	}
+
 }
 
 
@@ -363,8 +419,9 @@ function getMarketDataForMarketInRangeCallback(data) {
 
 	console.log(graphData);
 
-	if (svg == null) createD3SVG();
-
+	if (svg == null) {
+		createD3SVG();
+	}  
 	createD3LineGraph();
 }
 
@@ -407,6 +464,13 @@ function getMarketNamesForMarketCallback(data) {
 		"MarketRightVisible": true,
 		"lastTimestamp": Date.now()
 	}
+
+	var marketRange = {
+		"marketname": data.MarketChainName,
+		"start": "1530664467249",
+		"end": "1530764579331"
+	};
+	getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 
 	/*
 	console.log("SUCCESS  " + data.MarketChainName + " -- " + displayedMarkets[data.MarketChainName].MarketLeftName + " -- " + displayedMarkets[data.MarketChainName].MarketRightName);
