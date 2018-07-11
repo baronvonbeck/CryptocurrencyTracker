@@ -181,7 +181,7 @@ function update() {
                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                     '</div>' +
-                    "<a href=/g/" + market.name +  "</a>"
+                    "<a href=/g/" + market.name + ">" + market.name + "</a>"
                 );
 
                  $(selectIDLeft).html(
