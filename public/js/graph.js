@@ -42,7 +42,7 @@ $(document).ready(function() {
 
 	setTimeout(1000);
 	// if there was a graph context, display that graph
-	displayNewMarketOnGraph("BTC_ADA_ETH");
+	displayNewMarketOnGraph($("#mname").val());
 
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
@@ -56,25 +56,25 @@ function createD3SVG() {
 	x = d3.time.scale()
 	    .domain([ parseInt(graphData[0][0].x), parseInt(Date.now()) ])
 	    .range([0, width]);
-	 
+
 	y = d3.scale.linear()
 	    .domain([0.85, 1.05])
 	    .range([height, 0]);
-		
+
 	xAxis = d3.svg.axis()
 	    .scale(x)
 		.tickSize(-height)
-		.tickPadding(10)	
-		.tickSubdivide(true)	
-	    .orient("bottom");	
-		
+		.tickPadding(10)
+		.tickSubdivide(true)
+	    .orient("bottom");
+
 	yAxis = d3.svg.axis()
 	    .scale(y)
 		.tickPadding(10)
 		.tickSize(-width)
-		.tickSubdivide(true)	
+		.tickSubdivide(true)
 	    .orient("left");
-		
+
 	var zoom = d3.behavior.zoom()
 	    .x(x)
 	    .y(y)
@@ -89,16 +89,16 @@ function createD3SVG() {
 		.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	    //.attr('id', 'canvas');
-	 
+
 	svg.append("g")
 	    .attr("class", "x axis")
 	    .attr("transform", "translate(0," + height + ")")
 	    .call(xAxis);
-	 
+
 	svg.append("g")
 	    .attr("class", "y axis")
 	    .call(yAxis);
-	 
+
 	svg.append("g")
 		.attr("class", "y axis")
 		.append("text")
@@ -106,8 +106,8 @@ function createD3SVG() {
 		.attr("transform", "rotate(-90)")
 		.attr("y", (-margin.left) + 10)
 		.attr("x", -height/2)
-		.text('Axis Label');	
-	 
+		.text('Axis Label');
+
 	svg.append("clipPath")
 		.attr("id", "clip")
 		.append("rect")
@@ -117,22 +117,22 @@ function createD3SVG() {
 
 
 function createD3LineGraph() {
-	
+
 	//************************************************************
 	// Create D3 line object and draw data on our SVG object
 	//************************************************************
 	line = d3.svg.line()
-	    .interpolate("linear")	
+	    .interpolate("linear")
 	    .x(function(d) { return x(parseInt(d.x)); })
-	    .y(function(d) { return y(d.y); });		
-		
+	    .y(function(d) { return y(d.y); });
+
 	svg.selectAll('.line')
 		.data(graphData)
 		.enter()
 		.append("path")
 	    .attr("class", "line")
 		.attr("clip-path", "url(#clip)")
-		.attr('stroke', function(d,i){ 			
+		.attr('stroke', function(d,i){
 			return colors[i%colors.length];
 		})
 	    .attr("d", line);
@@ -146,24 +146,24 @@ function createD3LineGraph() {
 		.enter()
 		.append("g")
 	    .attr("class", "dots")
-		.attr("clip-path", "url(#clip)");	
-	 
+		.attr("clip-path", "url(#clip)");
+
 	points.selectAll('.dot')
-		.data(function(d, index){ 		
+		.data(function(d, index){
 			var a = [];
 			d.forEach(function(point,i){
 				a.push({'index': index, 'point': point});
-			});		
+			});
 			return a;
 		})
 		.enter()
 		.append('circle')
 		.attr('class','dot')
 		.attr("r", 2.5)
-		.attr('fill', function(d,i){ 	
+		.attr('fill', function(d,i){
 			return colors[d.index%colors.length];
-		})	
-		.attr("transform", function(d) { 
+		})
+		.attr("transform", function(d) {
 			return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
 		);
 
@@ -196,7 +196,7 @@ function displayNewMarketOnGraph(marketName) {
 		};
 		getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 
-		
+
 	}
 	else if (!displayedMarkets.hasOwnProperty(marketName)) {
 		//TODO: display error message on page saying marketName has already been graphed
@@ -211,7 +211,7 @@ function displayNewMarketOnGraph(marketName) {
 function updateCurrentlyDisplayedGraphs() {
 
 	Object.keys(displayedMarkets).forEach( function(key) {
-		
+
 		var marketRange = {
 			"marketname": key,
 			"start": parseInt(displayedMarkets[key].lastTimestamp) + 1,
@@ -307,17 +307,17 @@ function hideMarketOnGraphHandler(marketNameLR) {
 	hideMarketOnGraph(marketNameLR);
 }
 
-/* 
+/*
  * Handler for zooming in and out on the graph
  */
 function zoomed() {
 	svg.select(".x.axis").call(xAxis);
-	svg.select(".y.axis").call(yAxis);   
-	svg.selectAll('path.line').attr('d', line);  
- 
-	points.selectAll('circle').attr("transform", function(d) { 
+	svg.select(".y.axis").call(yAxis);
+	svg.selectAll('path.line').attr('d', line);
+
+	points.selectAll('circle').attr("transform", function(d) {
 		return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
-	);  
+	);
 }
 
 /*****************************************************************************
@@ -339,7 +339,7 @@ function getMarketDataForMarketInRangeCallback(data) {
 
 	var left = [];
 	var right = [];
-	
+
 	var lastT;
 
 	data[key].forEach(function(item) {
