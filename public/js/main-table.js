@@ -120,7 +120,7 @@ function initialize() {
                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                      '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                      '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '</div>' +  "<a href=/g/" + market.name + "." + lName + "." + rName + ">" + market.name + "</a>" + '</td>' +
+                     '</div>' +  "<a href=/g/" + market.name + ">" + market.name + "</a>" + '</td>' +
                      '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
                      '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
                      '</tr>'
@@ -181,7 +181,7 @@ function update() {
                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                     '</div>' +
-                    "<a href=/g/" + market.name + "." + lName + "." + rName + ">" + market.name + "</a>"
+                    "<a href=/g/" + market.name +  "</a>"
                 );
 
                  $(selectIDLeft).html(
