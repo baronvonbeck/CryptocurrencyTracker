@@ -5,7 +5,7 @@
 const MAX_MARKETS = 5;
 
 // Refresh rate
-const REFRESH = 10000;
+const REFRESH = 10000;  // 10 seconds
 
 // List of all possible graphs
 var allMarketNames = [];
@@ -21,10 +21,16 @@ var graphPos = 0;
 
 // variables for tracking D3 graph
 var colors = [
-	'steelblue',
-	'green',
-	'red',
-	'purple'
+	'#0000FF',
+	'#0099FF',
+	'#6600FF',
+	'#66CCCC',
+	'#000033',
+	'#003333',
+	'#254117',
+	'#5FFB17',
+	'#E41B17',
+	'#810541'
 ];
 var svg = null;
 var line = null;
@@ -34,35 +40,30 @@ var margin = {top: 20, right: 30, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-
 $(document).ready(function() {
 
 	// add all the market names to the dropdown
 	addMarketNamesToDropdown();
-	addAutoComplete();
-
-	// if there was a graph context, display that graph
-	displayNewMarketOnGraph($("#mname").text());
-	displayError("There is an error!");
-
-
-	setTimeout(function() {
-		displayNewMarketOnGraph("BTC_ZRX_ETH");
-	}, 5000);
-
-
+	
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
 	}, REFRESH);
 
 });
 
-function addAutoComplete() {
+function addAutoCompleteToDropdown() {
 	$("#myInput").on('input', function() {
-        console.log($(this).val());
+        // console.log($(this).val());
     });
-    $("#button").click(function() {
-        $("#form1").attr("action",  "/g/" + $("#myInput").val());
+    $("#addbutton").click(function() {
+
+        // if there was a graph context, display that graph
+		displayNewMarketOnGraph($("#myInput").val().toUpperCase());
+    });
+    $("#removebutton").click(function() {
+
+        // if there was a graph context, display that graph
+		removeMarketFromGraph($("#myInput").val().toUpperCase());
     });
 
 	function autocomplete(inp, arr) {
@@ -110,10 +111,10 @@ function addAutoComplete() {
 				addActive(x);
 			} else if (e.keyCode == 13) { // ENTER
 				e.preventDefault();
-			if (currentFocus > -1) {
-				  // Simulate a click
-				  if (x) x[currentFocus].click();
-			}
+				if (currentFocus > -1) {
+					  // Simulate a click
+					  if (x) x[currentFocus].click();
+				}
 			}
 		});
 	function addActive(x) {
@@ -141,12 +142,9 @@ function addAutoComplete() {
 	  });
 	}
 
-	// CHANGE LATER
-	var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
-
-    autocomplete(document.getElementById("myInput"), countries);
-
+	autocomplete(document.getElementById("myInput"), allMarketNames);
 }
+
 
 function displayError(text) {
 	$(".message-box").html("<div class='alert-red'>" + text + "<span class='closebtn'" + ">&times;</span></div>");
@@ -162,8 +160,11 @@ function displayError(text) {
 // creates SVG for the D3 line graph
 function createD3SVG() {
 
+	var xDomainLeft = parseInt(graphData[0][0].x) - 
+		(parseInt(Date.now()) - parseInt(graphData[0][0].x));
+
 	x = d3.time.scale()
-	    .domain([ parseInt(graphData[0][0].x), parseInt(Date.now()) ])
+	    .domain([ xDomainLeft, parseInt(Date.now()) + 1000000 ])
 	    .range([0, width]);
 
 	y = d3.scale.linear()
@@ -292,11 +293,6 @@ function createD3LineGraph() {
 // updates the line graph upon entry of new data
 function updateD3LineGraph() {
 
-	// line = d3.svg.line()
-	//     .interpolate("linear")
-	//     .x(function(d) { return x(parseInt(d.x)); })
-	//     .y(function(d) { return y(d.y); });
-
 	svg.selectAll('.line')
 		.data(graphData)
 		.enter()
@@ -344,12 +340,12 @@ function updateD3LineGraph() {
  */
 function displayNewMarketOnGraph(marketName) {
 
-	/*
 	if (allMarketNames.indexOf(marketName) < 0 ) {
 		//TODO: display error message on page saying marketName is invalid
-		displayError("Error! Market name is invalid.");
+		displayError("Error! Market " + marketName + " is invalid and can't be added.");
+		return;
 	}
-	*/
+
 	if (!displayedMarkets.hasOwnProperty(marketName)
 		&& Object.keys(displayedMarkets).length < MAX_MARKETS) {
 
@@ -357,12 +353,12 @@ function displayNewMarketOnGraph(marketName) {
 			getMarketNamesForMarketCallback);
 
 	}
-	else if (!displayedMarkets.hasOwnProperty(marketName)) {
-		//TODO: display error message on page saying marketName has already been graphed
-		displayError("Error! Market has already been graphed!");
+	else if (displayedMarkets.hasOwnProperty(marketName)) {
+		
+		displayError("Error! Market " + marketName + " has already been graphed!");
 	}
-	else if (Object.keys(displayedMarkets).length < MAX_MARKETS) {
-		//TODO: display error message on graph page saying maximum number of markets is already being displayed
+	else if (Object.keys(displayedMarkets).length >= MAX_MARKETS) {
+		
 		displayError("Error! Maximum amount of markets are already being displayed.");
 	}
 
@@ -374,14 +370,14 @@ function updateCurrentlyDisplayedGraphs() {
 
 	Object.keys(displayedMarkets).forEach( function(key) {
 
-		var marketRange = {
-			"marketname": key,
-			"start": parseInt(displayedMarkets[key].lastTimestamp) + 1,
-			"end": Date.now()
-		};
-		getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeAppendCallback);
-
-		//TODO: update data points in the D3 graph
+		if (!isNaN(parseInt(displayedMarkets[key].lastTimestamp))) {
+			var marketRange = {
+				"marketname": key,
+				"start": parseInt(displayedMarkets[key].lastTimestamp) + 1,
+				"end": Date.now()
+			};
+			getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeAppendCallback);
+		} 
 	});
 }
 
@@ -389,18 +385,42 @@ function updateCurrentlyDisplayedGraphs() {
 // Removes market from the graph
 function removeMarketFromGraph(marketName) {
 
-	delete displayedMarkets[marketName];
+	if (allMarketNames.indexOf(marketName) < 0 ) {
+		//TODO: display error message on page saying marketName is invalid
+		displayError("Error! Market " + marketName + " is invalid and can't be removed.");
+		return;
+	}
+	else if (!displayedMarkets.hasOwnProperty(marketName)) {
+		displayError("Error! Market " + marketName + " has not been graphed yet!");
+		return;
+	}
 
 	var decrementPoint = displayedMarkets[marketName].graphDataPosRight;
 
-	delete graphData[displayedMarkets[marketName].graphDataPosLeft];
-	delete graphData[decrementPoint];
+	// remove data from the graph
+	graphData.splice(decrementPoint - 1, 2);
+	graphPos -= 2;
 
-	displayedMarkets.forEach( function(item) {
-		if (item.graphDataPosLeft > decrementPoint) item.graphDataPosLeft -= 2;
-		if (item.graphDataPosRight > decrementPoint) item.graphDataPosRight -= 2;
+	// recycle the colors so they don't disturb the order of the current graph and can be reused for future graph
+	var colorLeft = colors[decrementPoint - 1];
+	var colorRight = colors[decrementPoint];
+	colors.splice(decrementPoint - 1, 2);
+	colors.push(colorLeft);
+	colors.push(colorRight);
+
+	
+	// graphs added after the removed graph have shifted up 2 in the graphData array; update positions
+	Object.keys(displayedMarkets).forEach( function(key) {
+		if (displayedMarkets[key].graphDataPosLeft > decrementPoint) 
+			displayedMarkets[key].graphDataPosLeft -= 2;
+
+		if (displayedMarkets[key].graphDataPosRight > decrementPoint) 
+			displayedMarkets[key].graphDataPosRight -= 2;
 	});
-	//TODO: remove the market from the D3 graph
+
+	delete displayedMarkets[marketName];
+
+	createD3LineGraph();
 }
 
 
@@ -408,12 +428,6 @@ function removeMarketFromGraph(marketName) {
 function addMarketNamesToDropdown() {
 
 	getAllValidMarketNames(getAllValidMarketNamesCallback);
-}
-
-
-// Adds all market names to the dropdown
-function addToDropdown() {
-	//TODO: add allMarketNames to the dropdown
 }
 
 
@@ -437,21 +451,6 @@ function hideMarketOnGraphHandler(marketNameLR) {
 /*****************************************************************************
  * Handler Functions ----- START ------
  *****************************************************************************/
-
-/*
- * Handler for clicking the remove button to remove a market from the graph
- */
-function removeMarketFromGraphHandler(marketName) {
-	removeMarketFromGraph(marketName);
-}
-
-
-/*
- * Handler for clicking the add button to add a market to the graph
- */
-function addNewMarketToGraphHandler(marketName) {
-	displayNewMarketOnGraph(marketName);
-}
 
 
 /*
@@ -498,11 +497,15 @@ function zoomed() {
 function getMarketDataForMarketInRangeCallback(data) {
 
 	var key = Object.keys(data)[0];
-
 	var left = [];
 	var right = [];
-
 	var lastT;
+
+	if (data[key].length < 1) {
+		displayError("Market " + key + " has no data!");
+		delete displayedMarkets[key];
+		return;
+	}
 
 	data[key].forEach(function(item) {
 		left.push({'x': item.DataTimestamp, 'y': item.LeftVal});
@@ -522,8 +525,6 @@ function getMarketDataForMarketInRangeCallback(data) {
 
 	graphData.push(left);
 	graphData.push(right);
-
-	console.log(graphData);
 
 	if (svg == null) {
 		createD3SVG();
@@ -574,7 +575,7 @@ function getMarketNamesForMarketCallback(data) {
 	var marketRange = {
 		"marketname": data.MarketChainName,
 		"start": "1530664467249",
-		"end": "1530764579331"
+		"end":   "1530764579331"
 	};
 	getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 
@@ -591,7 +592,13 @@ function getAllValidMarketNamesCallback(data) {
 
 	allMarketNames = data;
 
-	addToDropdown();
+	// if there was a context, display the graph clicked from the main table
+	if ($("#mname").text().length > 0) {
+		displayNewMarketOnGraph($("#mname").text());
+	}
+
+	// add autocomplete functionality to the dropdown
+	addAutoCompleteToDropdown();
 
 	/*
 	allMarketNames.forEach(function(item) {

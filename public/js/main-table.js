@@ -68,13 +68,46 @@ const MARKET_SUMMARIES = '/marketsummaries';
 
 $(document).ready(function() {
 
-     initialize();
+    initialize();
 
-     setInterval(function() {
-         update();
-     }, REFRESH);
+    
+    setInterval(function() {
+        update();
+    }, REFRESH);
 });
 
+/*
+// Posts a valid market and its corresponding left and right names into dynamoDB
+function postValidMarket(marketData) {
+     $.ajax({
+         type: 'POST',
+         url: POST_VALID_MARKET,
+         async: true,
+         data: JSON.stringify(marketData),
+         dataType: 'json',
+         contentType: "application/json",
+         success: (function(data) {
+             console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
+         })
+     });
+}
+
+
+// Posts the data for a given market at a given timestamp
+function postMarketData(marketData) {
+     $.ajax({
+         type: 'POST',
+         url: POST_DATA_FOR_MARKET,
+         async: true,
+         data: JSON.stringify(marketData),
+         dataType: 'json',
+         contentType: "application/json",
+         success: (function(data) {
+             console.log("Return succsessful for data post for: " + marketData.MarketChainName);
+         })
+     });
+}
+*/
 
 //TODO: Possibly merge initialize and update functions?
 function initialize() {
@@ -103,6 +136,14 @@ function initialize() {
                  var selectIDLeft = i + "-LEFT";
                  var selectIDRight = i + "-RIGHT";
                  var selectID = i + "-MARKET";
+
+                 /*
+                putValidMarket({
+                    "MarketChainName": market.name,
+                    "MarketLeftName": market.leftname,
+                    "MarketRightName": market.rightname
+                });
+                */
 
                  var mVal = 0;
                  for(var j = 0; j < markets.length; j ++) {
@@ -291,6 +332,15 @@ function calculateMarketValues() {
         market.right =  conversions[market.a][market.b] *
                         conversions[market.b][market.c] *
                         conversions[market.c][market.a] * fee;
+
+        /*
+        postMarketData({
+            "MarketChainName": market.name,
+            "RightVal": market.right,
+            "LeftVal": market.left,
+            "DataTimestamp": Date.now()
+        });
+        */
     }
 }
 
