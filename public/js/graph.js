@@ -39,21 +39,124 @@ $(document).ready(function() {
 
 	// add all the market names to the dropdown
 	addMarketNamesToDropdown();
+	addAutoComplete();
 
 	// if there was a graph context, display that graph
 	displayNewMarketOnGraph($("#mname").text());
+	displayError("There is an error!");
 
 
 	setTimeout(function() {
 		displayNewMarketOnGraph("BTC_ZRX_ETH");
 	}, 5000);
-	
+
 
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
 	}, REFRESH);
 
 });
+
+function addAutoComplete() {
+	$("#myInput").on('input', function() {
+        console.log($(this).val());
+    });
+    $("#button").click(function() {
+        $("#form1").attr("action",  "/g/" + $("#myInput").val());
+    });
+
+	function autocomplete(inp, arr) {
+		var currentFocus;
+
+		inp.addEventListener("input", function(e) {
+			var a, b, i, val = this.value;
+			// Close list of auto-completed values
+			closeAllLists();
+			if (!val) { return false;}
+			currentFocus = -1;
+
+			a = document.createElement("DIV");
+			a.setAttribute("id", this.id + "autocomplete-list");
+			a.setAttribute("class", "autocomplete-items");
+			this.parentNode.appendChild(a);
+
+			for (i = 0; i < arr.length; i++) {
+				if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+				  // Create a div for a matching element
+				  b = document.createElement("DIV");
+				  b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+				  b.innerHTML += arr[i].substr(val.length);
+				  b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+
+				  // When someone clicks on the item:
+				  b.addEventListener("click", function(e) {
+				      inp.value = this.getElementsByTagName("input")[0].value;
+				      closeAllLists();
+				  });
+				  a.appendChild(b);
+				}
+			}
+		});
+
+		// Listens for keydown inputs (when user presses a key)
+		inp.addEventListener("keydown", function(e) {
+			var x = document.getElementById(this.id + "autocomplete-list");
+			if (x) x = x.getElementsByTagName("div");
+			if (e.keyCode == 40) { // DOWN
+				currentFocus++;
+				addActive(x);
+			} else if (e.keyCode == 38) { // UP
+				currentFocus--;
+				addActive(x);
+			} else if (e.keyCode == 13) { // ENTER
+				e.preventDefault();
+			if (currentFocus > -1) {
+				  // Simulate a click
+				  if (x) x[currentFocus].click();
+			}
+			}
+		});
+	function addActive(x) {
+		if (!x) return false;
+		removeActive(x);
+		if (currentFocus >= x.length) currentFocus = 0;
+		if (currentFocus < 0) currentFocus = (x.length - 1);
+			x[currentFocus].classList.add("autocomplete-active");
+		}
+		function removeActive(x) {
+			for (var i = 0; i < x.length; i++) {
+			  x[i].classList.remove("autocomplete-active");
+			}
+		}
+		function closeAllLists(elmnt) {
+			var x = document.getElementsByClassName("autocomplete-items");
+			for (var i = 0; i < x.length; i++) {
+				if (elmnt != x[i] && elmnt != inp) {
+					x[i].parentNode.removeChild(x[i]);
+				}
+			}
+		}
+	document.addEventListener("click", function (e) {
+		  closeAllLists(e.target);
+	  });
+	}
+
+	// CHANGE LATER
+	var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
+
+    autocomplete(document.getElementById("myInput"), countries);
+
+}
+
+function displayError(text) {
+	$(".message-box").html("<div class='alert-red'>" + text + "<span class='closebtn'" + ">&times;</span></div>");
+	$(".message-box")
+		.css("display", "inline-block");
+	$(".closebtn").click(function() {
+		// this.parentElement.style.display = "none";
+		$(".message-box").children("div.alert-red").remove();
+	})
+}
 
 
 // creates SVG for the D3 line graph
@@ -127,7 +230,7 @@ function createD3LineGraph() {
 	$(".line").remove();
 	$(".dots").remove();
 	$(".dot").remove();
-	
+
 	//************************************************************
 	// Create D3 line object and draw data on our SVG object
 	//************************************************************
@@ -244,6 +347,7 @@ function displayNewMarketOnGraph(marketName) {
 	/*
 	if (allMarketNames.indexOf(marketName) < 0 ) {
 		//TODO: display error message on page saying marketName is invalid
+		displayError("Error! Market name is invalid.");
 	}
 	*/
 	if (!displayedMarkets.hasOwnProperty(marketName)
@@ -255,9 +359,11 @@ function displayNewMarketOnGraph(marketName) {
 	}
 	else if (!displayedMarkets.hasOwnProperty(marketName)) {
 		//TODO: display error message on page saying marketName has already been graphed
+		displayError("Error! Market has already been graphed!");
 	}
 	else if (Object.keys(displayedMarkets).length < MAX_MARKETS) {
 		//TODO: display error message on graph page saying maximum number of markets is already being displayed
+		displayError("Error! Maximum amount of markets are already being displayed.");
 	}
 
 }
@@ -421,7 +527,7 @@ function getMarketDataForMarketInRangeCallback(data) {
 
 	if (svg == null) {
 		createD3SVG();
-	}  
+	}
 	createD3LineGraph();
 }
 

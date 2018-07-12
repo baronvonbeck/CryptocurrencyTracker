@@ -8,7 +8,7 @@ var ABOUT = '/about';
 var BITTREX = 'https://bittrex.com/api/v1.1/public/';
 var CONTACT = '/contact';
 var GRAPH = '/g/:market';
-var GRAPHS = '/graphs';
+var GRAPHS = '/g/';
 var MARKETS = '/markets';
 var MARKETS_M = MARKETS + '/:market';
 var MARKETSUMMARIES = '/marketsummaries';
@@ -27,12 +27,11 @@ router.get(CONTACT, (req, res) => {
 });
 
 router.get(GRAPHS, (req,res) => {
-    res.render('graphs.ejs');
+    res.render('graph.ejs', {market: ""});
 });
 
 router.get(GRAPH, (req, res) => {
     //res.send(req.params)
-    console.log(req.params.market === '');
     res.render('graph.ejs', req.params);
 
 

@@ -10,13 +10,17 @@
 <body>
 
     <div class="main-nav">
-        <nav>
-            <a href="/">Home</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-            <a href="/graphs">Graphs</a>
-        </nav>
+        <% include navbar %>
     </div>
+    <div class="message-box">
+    </div>
+    <div class="form-wrapper">
+        <form id= "form1" action="/g/">
+            <div class="autocomplete" style="width:300px;">
+                <input id="myInput" type="text" >
+          </div>
+      <input id= "button" type="submit">
+        </form>
     <h1 id="mname"><%= market %></h1>
 </body>
 
