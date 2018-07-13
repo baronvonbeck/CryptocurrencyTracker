@@ -42,6 +42,7 @@ h1 {
 
 .axis text {
     fill: #555;
+    font-family: 'Fira Sans', sans-serif;
 }
 
 .axis line {
@@ -51,6 +52,7 @@ h1 {
 
 .axis .axis-label {
     font-size: 14px;
+    font-family: 'Fira Sans', sans-serif;
 }
 
 .line {
@@ -127,11 +129,21 @@ input[type=text] {
   width: 100%;
 }
 input[type=submit] {
-  background-color: DodgerBlue;
+  /*background-color: DodgerBlue; */
   margin-left: 20px;
   color: #fff;
   cursor: pointer;
 }
+
+#addbutton {
+    background-color: green;
+}
+
+#removebutton {
+    background-color: red;
+    margin-left: 1px;
+}
+
 .autocomplete-items {
   position: absolute;
   border: 1px solid #d4d4d4;

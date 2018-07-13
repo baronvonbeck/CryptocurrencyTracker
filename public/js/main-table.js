@@ -16,6 +16,10 @@ const REFRESH = 2000;
 // main associative array to hold data per market name (e.g. "BTC-LTC")
 var marketSummaries = {};
 
+// coin images
+var coinImages = {};
+var COINS = '/coins';
+
 // 2D array to convert one coin into another
 // newcoin = oldcoin * conversions[old coin symbol][new coin symbol];
 var conversions = {};
@@ -64,56 +68,33 @@ var highlightedMarkets = {};
 // Routes - Bittrex
 const MARKET_SUMMARIES = '/marketsummaries';
 
-
+// Image Routes - CryptoCompare
 
 $(document).ready(function() {
-
     initialize();
 
-    
     setInterval(function() {
         update();
     }, REFRESH);
 });
 
-/*
-// Posts a valid market and its corresponding left and right names into dynamoDB
-function postValidMarket(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_VALID_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
-         })
-     });
+function grabCoins() {
+    // Request to grab all the coins
+    $.ajax({
+        url: COINS,
+        success: function (data) {
+            coinImages = data;
+            //console.log(coinImages.Data["BTC"].ImageURL);
+        }
+    });
 }
-
-
-// Posts the data for a given market at a given timestamp
-function postMarketData(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_DATA_FOR_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for data post for: " + marketData.MarketChainName);
-         })
-     });
-}
-*/
 
 //TODO: Possibly merge initialize and update functions?
 function initialize() {
 
      // Bittrex API: get summary of all market exchanges
      // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
+
      $.ajax({
          url: MARKET_SUMMARIES,
          success: (function (data) {
@@ -132,7 +113,6 @@ function initialize() {
 
                  var market = currentMarkets[i];
                  highlightedMarkets[market.name] = false;
-
                  var selectIDLeft = i + "-LEFT";
                  var selectIDRight = i + "-RIGHT";
                  var selectID = i + "-MARKET";
@@ -154,11 +134,14 @@ function initialize() {
                  var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
                  var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
 
+                 //console.log(coinImages);
+                 //var firstCoinURL = "https://www.cryptocompare.com" + coinImages[market.a].ImageURL;
+
                  $("#main-table").append(
                      '<tr class="trow">' +
 
                      '<td class="market" id=' + selectID + '>' + '<div class="avatar-container">' +
-                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                      '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                      '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
                      '</div>' +  "<a href=/g/" + market.name + ">" + market.name + "</a>" + '</td>' +

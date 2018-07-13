@@ -21,22 +21,22 @@ var graphPos = 0;
 
 // variables for tracking D3 graph
 var colors = [
-	'#0000FF',
-	'#0099FF',
-	'#6600FF',
-	'#66CCCC',
-	'#000033',
-	'#003333',
-	'#254117',
-	'#5FFB17',
-	'#E41B17',
+	'#4D4D4D',
+	'#5DA5DA',
+	'#FAA43A',
+	'#60BD68',
+	'#F17CB0',
+	'#B2912F',
+	'#B276B2',
+	'#DECF3F',
+	'#F15854',
 	'#810541'
 ];
 var svg = null;
 var line = null;
 var points = null;
 var x, y, xAxis, yAxis;
-var margin = {top: 20, right: 30, bottom: 30, left: 50},
+var margin = {top: 20, right: 30, bottom: 30, left: 70},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -44,7 +44,7 @@ $(document).ready(function() {
 
 	// add all the market names to the dropdown
 	addMarketNamesToDropdown();
-	
+
 	setInterval(function() {
 		updateCurrentlyDisplayedGraphs();
 	}, REFRESH);
@@ -160,7 +160,7 @@ function displayError(text) {
 // creates SVG for the D3 line graph
 function createD3SVG() {
 
-	var xDomainLeft = parseInt(graphData[0][0].x) - 
+	var xDomainLeft = parseInt(graphData[0][0].x) -
 		(parseInt(Date.now()) - parseInt(graphData[0][0].x));
 
 	x = d3.time.scale()
@@ -191,7 +191,7 @@ function createD3SVG() {
 	    .scaleExtent([1, 1000])
 	    .on("zoom", zoomed);
 
-	svg = d3.select("body").append("svg")
+	svg = d3.select("#svg-wrapper").append("svg")
 		.call(zoom)
 	    .attr("width", width + margin.left + margin.right)
 	    .attr("height", height + margin.top + margin.bottom)
@@ -354,11 +354,11 @@ function displayNewMarketOnGraph(marketName) {
 
 	}
 	else if (displayedMarkets.hasOwnProperty(marketName)) {
-		
+
 		displayError("Error! Market " + marketName + " has already been graphed!");
 	}
 	else if (Object.keys(displayedMarkets).length >= MAX_MARKETS) {
-		
+
 		displayError("Error! Maximum amount of markets are already being displayed.");
 	}
 
@@ -377,7 +377,7 @@ function updateCurrentlyDisplayedGraphs() {
 				"end": Date.now()
 			};
 			getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeAppendCallback);
-		} 
+		}
 	});
 }
 
@@ -408,13 +408,13 @@ function removeMarketFromGraph(marketName) {
 	colors.push(colorLeft);
 	colors.push(colorRight);
 
-	
+
 	// graphs added after the removed graph have shifted up 2 in the graphData array; update positions
 	Object.keys(displayedMarkets).forEach( function(key) {
-		if (displayedMarkets[key].graphDataPosLeft > decrementPoint) 
+		if (displayedMarkets[key].graphDataPosLeft > decrementPoint)
 			displayedMarkets[key].graphDataPosLeft -= 2;
 
-		if (displayedMarkets[key].graphDataPosRight > decrementPoint) 
+		if (displayedMarkets[key].graphDataPosRight > decrementPoint)
 			displayedMarkets[key].graphDataPosRight -= 2;
 	});
 
@@ -575,7 +575,7 @@ function getMarketNamesForMarketCallback(data) {
 	var marketRange = {
 		"marketname": data.MarketChainName,
 		"start": "1530664467249",
-		"end":   "1530764579331"
+		"end":   Date.now()
 	};
 	getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 
