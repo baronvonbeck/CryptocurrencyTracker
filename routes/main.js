@@ -39,9 +39,12 @@ router.get(GRAPH, (req, res) => {
 
 // Get cryptocompare coin list for image URLs
 router.get(COINS, (req, res) => {
-    var url = CRYPTOCOINLIST;
-    request(url, function(error, response, body) {
-        var result = JSON.parse(JSON.stringify(eval('(' + body + ')')));
+    request(CRYPTOCOINLIST, function(error, response, body) {
+        var hold = JSON.parse(JSON.stringify(eval('(' + body + ')')));
+        var result = {};
+        Object.keys(hold["Data"]).forEach( function(key) {
+            result[key] = hold["Data"][key].ImageUrl;
+        })
         res.json(result);
     });
 });

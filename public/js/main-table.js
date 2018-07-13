@@ -17,8 +17,11 @@ const REFRESH = 2000;
 var marketSummaries = {};
 
 // coin images
+var coinImageReturn = {};
 var coinImages = {};
-var COINS = '/coins';
+var evalCoinImageURLs = false;
+const loadingImagePath = 'http://placecorgi.com/32/32';
+const COINS = '/coins';
 
 // 2D array to convert one coin into another
 // newcoin = oldcoin * conversions[old coin symbol][new coin symbol];
@@ -68,9 +71,10 @@ var highlightedMarkets = {};
 // Routes - Bittrex
 const MARKET_SUMMARIES = '/marketsummaries';
 
-// Image Routes - CryptoCompare
+
 
 $(document).ready(function() {
+    grabCoins();
     initialize();
 
     setInterval(function() {
@@ -78,116 +82,54 @@ $(document).ready(function() {
     }, REFRESH);
 });
 
+
+// Request to grab all the coins
 function grabCoins() {
-    // Request to grab all the coins
     $.ajax({
         url: COINS,
         success: function (data) {
-            coinImages = data;
-            //console.log(coinImages.Data["BTC"].ImageURL);
+            coinImageReturn = data;
+            evalCoinImageURLs = true;
         }
     });
 }
 
-//TODO: Possibly merge initialize and update functions?
+
+// creates main table
 function initialize() {
 
-     // Bittrex API: get summary of all market exchanges
-     // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
+    // Bittrex API: get summary of all market exchanges
+    // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
 
-     $.ajax({
-         url: MARKET_SUMMARIES,
-         success: (function (data) {
-             if (data.result === null ) {
-                 console.log("Failed 'getMarketSummaries()'");
-                 return;
-             }
+    $.ajax({
+        url: MARKET_SUMMARIES,
+        success: (function (data) {
+            if (data.result === null ) {
+                console.log("Failed 'getMarketSummaries()'");
+                return;
+            }
 
-             getValidMarketConversions(data.result);
-             findValidConversionChains();
-             calculateMarketValues();
-             sortMarkets(selectedSortMethod);
+            getValidMarketConversions(data.result);
+            findValidConversionChains();
+            calculateMarketValues();
+            sortMarkets(selectedSortMethod);
 
-             // iterate through market chains to create html table
-             for (var i = 0; i < currentMarkets.length; i ++) {
+            // iterate through market chains to create html table
+            for (var i = 0; i < currentMarkets.length; i ++) {
 
-                 var market = currentMarkets[i];
-                 highlightedMarkets[market.name] = false;
-                 var selectIDLeft = i + "-LEFT";
-                 var selectIDRight = i + "-RIGHT";
-                 var selectID = i + "-MARKET";
+                var market = currentMarkets[i];
+                highlightedMarkets[market.name] = false;
+                var selectIDLeft = i + "-LEFT";
+                var selectIDRight = i + "-RIGHT";
+                var selectID = i + "-MARKET";
 
-                 /*
-                putValidMarket({
+                /*
+                postValidMarket({
                     "MarketChainName": market.name,
                     "MarketLeftName": market.leftname,
                     "MarketRightName": market.rightname
                 });
                 */
-
-                 var mVal = 0;
-                 for(var j = 0; j < markets.length; j ++) {
-                     if(markets[j] === currentMarkets[i]){
-                         mVal = j;
-                     }
-                 }
-                 var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
-                 var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
-
-                 //console.log(coinImages);
-                 //var firstCoinURL = "https://www.cryptocompare.com" + coinImages[market.a].ImageURL;
-
-                 $("#main-table").append(
-                     '<tr class="trow">' +
-
-                     '<td class="market" id=' + selectID + '>' + '<div class="avatar-container">' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '</div>' +  "<a href=/g/" + market.name + ">" + market.name + "</a>" + '</td>' +
-                     '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
-                     '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
-                     '</tr>'
-                 );
-             }
-
-             activateHighlightCallback();
-             activateSortDropdownCallback();
-
-             // make reference to a deep copy
-             previousMarkets = currentMarkets.slice(0);
-         })
-     });
-}
-
-
-function update() {
-
-     $.ajax({
-         url: MARKET_SUMMARIES,
-         success: (function (data) {
-             if (data.result === null) {
-                 console.log("Failed 'getMarketSummaries()'");
-                 return;
-             }
-
-             getValidMarketConversions(data.result);
-             findValidConversionChains();
-             calculateMarketValues();
-             sortMarkets(selectedSortMethod);
-
-             if (paused) {
-                 currentMarkets = previousMarkets.slice(0);
-             }
-
-             // iterate through market chains to update html table
-             for (var i = 0; i < currentMarkets.length; i ++) {
-                 var market = currentMarkets[i];
-                 var selectIDLeft = "#" + i + "-LEFT";
-                 var selectIDRight = "#" + i + "-RIGHT";
-                 var selectID = "#" + i + "-MARKET";
-
-                 $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
 
                 var mVal = 0;
                 for(var j = 0; j < markets.length; j ++) {
@@ -199,47 +141,131 @@ function update() {
                 var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
 
 
+                $("#main-table").append(
+                    '<tr class="trow">' +
+
+                    '<td class="market" id=' + selectID + '>' + '<div class="avatar-container">' +
+                    '<img src="' + loadingImagePath + '" class="td-avatar"/>' +
+                    '<img src="' + loadingImagePath + '" class="td-avatar"/>' +
+                    '<img src="' + loadingImagePath + '" class="td-avatar"/>' +
+                    '</div>' +  "<a href=/g/" + market.name + ">" + market.name + "</a>" + '</td>' +
+                    '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
+                    '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
+                    '</tr>'
+                );
+            }
+
+            activateHighlightCallback();
+            activateSortDropdownCallback();
+
+            // make reference to a deep copy
+            previousMarkets = currentMarkets.slice(0);
+        })
+    });
+}
+
+
+// updates table every few seconds
+function update() {
+
+    $.ajax({
+        url: MARKET_SUMMARIES,
+        success: (function (data) {
+            if (data.result === null) {
+                console.log("Failed 'getMarketSummaries()'");
+                return;
+            }
+
+            getValidMarketConversions(data.result);
+            findValidConversionChains();
+            calculateMarketValues();
+            sortMarkets(selectedSortMethod);
+
+            if (paused) {
+                currentMarkets = previousMarkets.slice(0);
+            }
+
+            // iterate through market chains to update html table
+            for (var i = 0; i < currentMarkets.length; i ++) {
+                var market = currentMarkets[i];
+                var selectIDLeft = "#" + i + "-LEFT";
+                var selectIDRight = "#" + i + "-RIGHT";
+                var selectID = "#" + i + "-MARKET";
+
+                $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
+
+                var mVal = 0;
+                for(var j = 0; j < markets.length; j ++) {
+                    if(markets[j] === currentMarkets[i]){
+                        mVal = j;
+                    }
+                }
+                var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
+                var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
+
+
+                if (evalCoinImageURLs && Object.keys(coinImageReturn).length > 0) {
+
+                    if (coinImageReturn[market.a] != undefined)
+                        coinImages[market.a] = 'https://www.cryptocompare.com' + coinImageReturn[market.a] + "?width=32";
+
+                    if (coinImageReturn[market.b] != undefined)
+                        coinImages[market.b] = 'https://www.cryptocompare.com' + coinImageReturn[market.b] + "?width=32";
+
+                    if (coinImageReturn[market.c] != undefined)
+                        coinImages[market.c] = 'https://www.cryptocompare.com' + coinImageReturn[market.c] + "?width=32";
+
+                    if (i == currentMarkets.length - 1) {
+                        coinImageReturn = {};
+                        evalCoinImageURLs = false;
+                    }
+                }
+
+                var marketAImageURL = (coinImages[market.a] != undefined) ? coinImages[market.a] : loadingImagePath;
+                var marketBImageURL = (coinImages[market.b] != undefined) ? coinImages[market.b] : loadingImagePath;
+                var marketCImageURL = (coinImages[market.c] != undefined) ? coinImages[market.c] : loadingImagePath;
+
                 $(selectID).html(
                     '<div class="avatar-container">' +
-                   '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
+                    '<img src="' + marketAImageURL + '" class="td-avatar"/>' +
+                    '<img src="' + marketBImageURL + '" class="td-avatar"/>' +
+                    '<img src="' + marketCImageURL + '" class="td-avatar"/>' +
                     '</div>' +
                     "<a href=/g/" + market.name + ">" + market.name + "</a>"
                 );
 
-                 $(selectIDLeft).html(
-                     market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font>'
-                 );
-                 $(selectIDRight).html(
-                     market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font>'
-                 );
+                $(selectIDLeft).html(
+                    market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font>'
+                );
+                $(selectIDRight).html(
+                    market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font>'
+                );
 
-                 if (highlightedMarkets[market.name] == true) {
-                     $("#main-table tr:nth-child(" + (i + 2) + ")" ).addClass("selected");
-                 }
-             }
+                if (highlightedMarkets[market.name] == true) {
+                    $("#main-table tr:nth-child(" + (i + 2) + ")" ).addClass("selected");
+                }
+            }
 
-             previousMarkets = currentMarkets.slice(0);
-         })
-     });
+            previousMarkets = currentMarkets.slice(0);
+        })
+    });
 }
 
 
- /*
-  * Get all possible market conversions between 2 different currencies
-  */
+/*
+ * Get all possible market conversions between 2 different currencies
+ */
 function getValidMarketConversions(reference) {
 
-     // iterate through markets and put them each into an array
-     for (var i = 0; i < reference.length; i ++) {
+    // iterate through markets and put them each into an array
+    for (var i = 0; i < reference.length; i ++) {
 
-         // ignore invalid/empty markets
-         if (reference[i].Bid <= 0)
-             continue;
+        // ignore invalid/empty markets
+        if (reference[i].Bid <= 0)
+            continue;
 
-         marketSummaries[reference[i].MarketName] = reference[i];
-     }
+        marketSummaries[reference[i].MarketName] = reference[i];
+    }
 }
 
 
@@ -392,10 +418,10 @@ function activateSortDropdownCallback() {
  * Sorting Comparator Functions ----- START ------
  *****************************************************************************/
 function aToZ(x, y) {
-     var xlower = x.name.toLowerCase();
-     var ylower = y.name.toLowerCase();
+    var xlower = x.name.toLowerCase();
+    var ylower = y.name.toLowerCase();
 
-     return xlower < ylower ? -1 : xlower > ylower ? 1 : 0;
+    return xlower < ylower ? -1 : xlower > ylower ? 1 : 0;
 }
 
 
