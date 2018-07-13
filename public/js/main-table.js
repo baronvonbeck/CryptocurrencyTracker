@@ -20,7 +20,8 @@ var marketSummaries = {};
 var coinImageReturn = {};
 var coinImages = {};
 var evalCoinImageURLs = false;
-const loadingImagePath = 'http://placecorgi.com/32/32';
+//const loadingImagePath = 'http://placecorgi.com/32/32';
+const loadingImagePath = "../img/load.gif";
 const COINS = '/coins';
 
 // 2D array to convert one coin into another
