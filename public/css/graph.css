@@ -55,6 +55,17 @@ h1 {
     font-family: 'Fira Sans', sans-serif;
 }
 
+.legend {
+    font-family: 'Fira Sans', sans-serif;
+}
+
+.legend-dot {
+    /* consider the stroke-with the mouse detect radius? */
+    stroke: transparent;
+    stroke-width: 10px;
+    cursor: pointer;
+}
+
 .line {
     fill: none;
     stroke-width: 1.5px;

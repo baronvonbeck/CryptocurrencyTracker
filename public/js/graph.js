@@ -7,6 +7,10 @@ const MAX_MARKETS = 5;
 // Refresh rate
 const REFRESH = 10000;  // 10 seconds
 
+// axis lables
+const X_AXIS_LABEL = "Time";
+const Y_AXIS_LABEL = "Chain Value"
+
 // List of all possible graphs
 var allMarketNames = [];
 
@@ -35,10 +39,12 @@ var colors = [
 var svg = null;
 var line = null;
 var points = null;
+var legend = null;
+var mouseGraph = null, mouseLines = null;
 var x, y, xAxis, yAxis;
-var margin = {top: 20, right: 30, bottom: 30, left: 70},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var margin = {top: 20, right: 70, bottom: 70, left: 80},
+    width = 1000 - margin.left - margin.right,
+    height = 550 - margin.top - margin.bottom;
 
 
 
@@ -63,10 +69,12 @@ function addMarketNamesToSearch() {
 
 // Adds autocomplet functionality to the search bar
 function addAutoCompleteToSearch() {
+	/*
 	$("#myInput").on('input', function() {
 
         // console.log($(this).val());
     });
+    */
     $("#addbutton").click(function() {
 
 		displayNewMarketOnGraph($("#myInput").val().toUpperCase());
@@ -169,6 +177,8 @@ function addAutoCompleteToSearch() {
  */
 function displayNewMarketOnGraph(marketName) {
 
+	removeDisplayError();
+
 	if (allMarketNames.indexOf(marketName) < 0 ) {
 		
 		displayError("Error! Market " + marketName + " is invalid and can't be added.");
@@ -213,6 +223,8 @@ function updateCurrentlyDisplayedGraphs() {
 
 // Removes market from the graph
 function removeMarketFromGraph(marketName) {
+
+	removeDisplayError();
 
 	if (allMarketNames.indexOf(marketName) < 0 ) {
 		//TODO: display error message on page saying marketName is invalid
@@ -314,7 +326,15 @@ function createD3SVG() {
 		.attr("transform", "rotate(-90)")
 		.attr("y", (-margin.left) + 10)
 		.attr("x", -height/2)
-		.text('Axis Label');
+		.text(Y_AXIS_LABEL);
+
+	svg.append("g")
+		.attr("class", "y axis")
+		.append("text")
+		.attr("class", "axis-label")
+		.attr("y", height + margin.bottom/2 + 10)
+		.attr("x", width/2 + 10)
+		.text(X_AXIS_LABEL);
 
 	svg.append("clipPath")
 		.attr("id", "clip")
@@ -343,11 +363,12 @@ function createD3LineGraph() {
 		.append("path")
 	    .attr("class", "line")
 		.attr("clip-path", "url(#clip)")
-		.attr('stroke', function(d,i){
+		.attr('stroke', function(d,i) {
 			return colors[i%colors.length];
 		})
 	    .attr("d", line);
 
+	
 	// Draw points on SVG object based on the data given
 	points = svg.selectAll('.dots')
 		.data(graphData)
@@ -374,6 +395,9 @@ function createD3LineGraph() {
 		.attr("transform", function(d) {
 			return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
 		);
+
+	addD3LegendToGraph();
+	showValuesOnD3Graph();
 
 	svg.selectAll('path.line').attr('d', line);
 	points.selectAll('circle').attr("transform", function(d) {
@@ -421,6 +445,175 @@ function updateD3LineGraph() {
 	);
 }
 
+
+// adds legend to the line graph
+function addD3LegendToGraph() {
+
+	$(".legend").remove();
+	
+	legend = svg.selectAll(".legend")
+		.data(graphData)
+		.enter()
+		.append("g")
+		.attr('class', 'legend');
+
+	legend.append('circle')
+		.attr('class', 'legend-dot')
+		.attr("transform", function(d, i) {
+			return "translate(" + (width - 160) + "," + (i * 18 + 11) + ")"; 
+		})
+		.attr('r', 5)
+		.style('fill', function(d, i) {
+			return colors[i%colors.length];
+		});
+
+	legend.append('text')
+		.attr("transform", function(d, i) {
+			return "translate(" + (width - 149) + "," + (i * 18 + 15) + ")"; 
+		})
+		.style('fill', function(d, i) {
+			return colors[i%colors.length];
+		})
+		.style("font-size", "12px")
+		.text(function (d, i) {
+			var returnVal;
+			Object.keys(displayedMarkets).forEach( function(key) {
+				if (displayedMarkets[key].graphDataPosLeft == i) {
+					returnVal = displayedMarkets[key].MarketLeftName;
+				}
+				else if (displayedMarkets[key].graphDataPosRight == i ) 
+					returnVal = displayedMarkets[key].MarketRightName;
+			});
+
+			return returnVal.replace(new RegExp(" &#10236; ", 'g'), "⟼");
+		}); 
+}
+
+
+// Mouseover event to show data values x_x
+function showValuesOnD3Graph() {
+
+	// remove previous instances so no conflicts
+	$(".mouse-per-line").remove();
+	$(".mouse-line").remove();
+	$(".mouse-over-effects").remove();
+
+	mouseGraph = svg.append("g")
+		.attr("class", "mouse-over-effects"); 
+
+	mouseGraph.append("path")
+		.attr("class", "mouse-line")
+		.style("stroke", "black")
+		.style("stroke-width", "1px")
+		.style("opacity", "0");
+
+	var graphLines = document.getElementsByClassName('line');
+
+	mouseLines = mouseGraph.selectAll(".mouse-per-line")
+		.data(graphData)
+		.enter()
+		.append("g")
+		.attr("class", "mouse-per-line");
+
+	mouseLines.append("circle")
+		.attr("r", 7)
+		.attr("id", function(d, i) {
+			return "valuecircle-" + i;
+		})
+		.style("stroke", function(d, i) {
+			return colors[i%colors.length];
+		})
+		.style("fill", "none")
+		.style("stroke-width", "1px")
+		.style("opacity", "0");
+
+	mouseLines.append("text")
+		.attr("id", function(d, i) {
+			return "valuetext-" + i;
+		})
+    	.attr("transform", "translate(10,3)")
+    	.style("stroke", function(d, i) {
+			return colors[i%colors.length];
+		});
+
+    mouseGraph.append("svg:rect")
+    	.attr("width", width)
+    	.attr("height", height)
+    	.attr('fill', 'none')
+    	.attr("pointer-events", "all")
+    	.on("mouseout", function() {  // hide everything on mouseout
+    		d3.select(".mouse-line")
+        		.style("opacity", "0");
+	        d3.selectAll(".mouse-per-line circle")
+	        	.style("opacity", "0");
+	        d3.selectAll(".mouse-per-line text")
+	        	.style("opacity", "0");
+    	})
+    	.on("mouseover", function() {  // show everything on mousein if necessary
+    		d3.select(".mouse-line")
+				.style("opacity", "1");
+			d3.selectAll(".mouse-per-line circle")
+				.style("opacity", "1");
+			d3.selectAll(".mouse-per-line text")
+				.style("opacity", "1");
+    	})
+    	.on("mousemove", function() {  // if over a valid line, show data
+    		var mouse = d3.mouse(this);
+    		d3.select(".mouse-line")
+    			.attr("d", function() {
+    				var d = "M" + mouse[0] + "," + height;
+    				d +=  " " + mouse[0] + "," + 0;
+    				return d;
+    			});
+
+    		d3.selectAll(".mouse-per-line")
+    			.attr("transform", function(d, i) {
+    				var xDate = x.invert(mouse[0]),
+    					bisect = d3.bisector(function(d) { return d.x }).right;
+    					idx = bisect(d.values, xDate);
+
+    				var beginning = 0,
+    					end = graphLines[i].getTotalLength(),
+    					target = null;
+
+    				var pos;
+
+    				while (true) {
+    					target = Math.floor((beginning + end) / 2);
+    					pos = graphLines[i].getPointAtLength(target);
+    					if ((target === end || target === beginning) && pos.x !== mouse[0])
+    						break;
+
+    					if (pos.x > mouse[0]) end = target;
+    					else if (pos.x < mouse[0]) beginning = target;
+    					else break;
+    				}
+
+    				d3.select(this).select("text")
+    					.text(y.invert(pos.y).toFixed(5));
+
+    				if (mouse[0] < pos.x - 2 
+    					|| mouse[0] > graphLines[i].getPointAtLength( Math.floor( graphLines[i].getTotalLength() ) ).x + 2 
+    					|| pos.y > height || pos.y < 0 || pos.x > width) {
+    					d3.select("#valuecircle-" + i)
+    						.style("opacity", "0");
+    					d3.select("#valuetext-" + i)
+    						.style("opacity", "0");
+    				}  // if mouse x position is not within the bounds of a graphed line, or
+    				// the translated circle/text descriptor will be out of bounds of the graph
+    				else {
+    					d3.select("#valuecircle-" + i)
+    						.style("opacity", "1");
+    					d3.select("#valuetext-" + i)
+    						.style("opacity", "1");
+    				}  // if mouse is too far to the right of graphed line
+					
+					// translate circles and text 
+    				return "translate(" + mouse[0] + "," + pos.y + ")";
+    			});
+    	});
+}
+
 /*****************************************************************************
  * D3 Functions ----- END ------
  *****************************************************************************/
@@ -450,11 +643,17 @@ function zoomed() {
  */
 function displayError(text) {
 	$(".message-box").html("<div class='alert-red'>" + text + "<span class='closebtn'" + ">&times;</span></div>");
-	$(".message-box")
-		.css("display", "inline-block");
 	$(".closebtn").click(function() {
 		$(".message-box").children("div.alert-red").remove();
 	})
+}
+
+
+/*
+ * Handler for removing display errors
+ */
+function removeDisplayError() {
+	$(".message-box").children("div.alert-red").remove();
 }
 
 /*****************************************************************************
@@ -548,7 +747,7 @@ function getMarketNamesForMarketCallback(data) {
 	var marketRange = {
 		"marketname": data.MarketChainName,
 		"start": "1530664467249",
-		"end":   Date.now()
+		"end":   Date.now() //"1530764574203" //
 	};
 	getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 }
