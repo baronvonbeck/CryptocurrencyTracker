@@ -17,3 +17,4 @@ hooks:
     - location: scripts/start_server
       timeout: 60
       runas: ec2-user
+  
