@@ -1,4 +1,5 @@
 #!/bin/bash
 source /home/ec2-user/.bash_profile
-cd /home/ec2-user/CryptocurrencyTracker
+cd /home/ec2-user/CryptocurrencyTracker 
 npm install
+npm install pm2 -g
