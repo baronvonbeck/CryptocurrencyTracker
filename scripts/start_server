@@ -1,4 +1,4 @@
 #!/bin/bash
 source /home/ec2-user/.bash_profile
 cd /home/ec2-user/CryptocurrencyTracker 
-/home/ec2-user/.nvm/versions/node/v8.11.3/bin/pm2 start app.js
+sudo pm2 start app.js
