@@ -132,16 +132,6 @@ function initialize() {
                 });
                 */
 
-                var mVal = 0;
-                for(var j = 0; j < markets.length; j ++) {
-                    if(markets[j] === currentMarkets[i]){
-                        mVal = j;
-                    }
-                }
-                var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
-                var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
-
-
                 $("#main-table").append(
                     '<tr class="trow">' +
 
@@ -194,16 +184,6 @@ function update() {
                 var selectID = "#" + i + "-MARKET";
 
                 $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
-
-                var mVal = 0;
-                for(var j = 0; j < markets.length; j ++) {
-                    if(markets[j] === currentMarkets[i]){
-                        mVal = j;
-                    }
-                }
-                var lName = markets[mVal].a + "_" + markets[mVal].c + "_" + markets[mVal].b +"_" + markets[mVal].a;
-                var rName =  markets[mVal].a + "_" + markets[mVal].b + "_" + markets[mVal].c +"_" + markets[mVal].a;
-
 
                 if (evalCoinImageURLs && Object.keys(coinImageReturn).length > 0) {
 

@@ -747,7 +747,7 @@ function getMarketNamesForMarketCallback(data) {
 	var marketRange = {
 		"marketname": data.MarketChainName,
 		"start": "1530664467249",
-		"end":   Date.now() //"1530764574203" //
+		"end":   Date.now()
 	};
 	getMarketDataForMarketInRange(marketRange, getMarketDataForMarketInRangeCallback);
 }
