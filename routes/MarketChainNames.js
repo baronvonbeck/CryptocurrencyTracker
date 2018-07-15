@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 
 
 AWS.config.update({
-    endpoint: "http://localhost:8000",
+    //endpoint: "http://localhost:8000",
     region: "us-west-2"
 });
 
