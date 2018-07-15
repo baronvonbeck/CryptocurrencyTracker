@@ -17,6 +17,7 @@
     "cors": "latest",
     "ejs": "latest",
     "express": "latest",
-    "request": "latest"
+    "request": "latest",
+    "pm2": "latest"
   }
 }

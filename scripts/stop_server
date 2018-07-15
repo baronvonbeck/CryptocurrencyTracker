@@ -1,6 +1,3 @@
 #!/bin/bash
-isExistApp = `pgrep httpd`
-if [[ -n  $isExistApp ]]; then
-    service httpd stop        
-fi
-
+source /home/ec2-user/.bash_profile
+pm2 stop all
