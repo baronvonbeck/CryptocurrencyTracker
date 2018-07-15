@@ -1,4 +1,5 @@
 #!/bin/bash
 source /home/ec2-user/.bash_profile
 cd /home/ec2-user/CryptocurrencyTracker 
+pm2 stop all
 pm2 start app.js

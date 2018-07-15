@@ -25,7 +25,6 @@ if (cluster.isMaster) {
 // Code to run if we're in a worker process
 }
 else {
-    const PORT = 3000;
     const express = require('express');
     const bodyParser = require('body-parser');
     const mainRoutes = require('./routes/main');
@@ -49,9 +48,9 @@ else {
     app.use('/', marketChainNameRoutes);
     app.use(express.static('public'));
 
-    app.set('port', process.env.PORT || 8080);
-    app.listen(app.get('port'), () => {
-        console.log("Listening on port: " + app.get('port'));
+    var port = process.env.PORT || 3000;
+    var server = app.listen(port, function() {
+        console.log("Server running at " + port);
     });
 
     module.exports = app;

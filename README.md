@@ -29,9 +29,9 @@ In the directory where the repository is, run either
     * node ./app.js
     * nodemon ./app.js
 
-Now, navigate to the following URL : http://localhost:8080
+Now, navigate to the following URL : http://localhost:3000
 
-The default URL is set to localhost with port 8080.
+The default URL is set to localhost with port 3000.
 
 ## TODO
     * Test on production AWS
