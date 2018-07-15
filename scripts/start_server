@@ -1,3 +1,6 @@
 #!/bin/bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 source /home/ec2-user/.bash_profile
-pm2 start /home/ec2-user/CryptocurrencyTracker/app.js
+cd /home/ec2-user/CryptocurrencyTracker
+pm2 start CryptocurrencyTracker/app.js
