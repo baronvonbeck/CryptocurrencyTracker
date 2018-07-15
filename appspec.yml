@@ -3,6 +3,11 @@ os: linux
 files:
   - source: /
     destination: /home/ec2-user/CryptocurrencyTracker
+permissions:
+  - object: /
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
 hooks:
   AfterInstall:
     - location: scripts/install_dependencies
@@ -12,4 +17,3 @@ hooks:
     - location: scripts/start_server
       timeout: 60
       runas: root
-
