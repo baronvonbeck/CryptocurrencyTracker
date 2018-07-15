@@ -4,11 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Cryptocurrency Chain Tracker</title>
+    <link rel="stylesheet" href="/css/graph.css" type="text/css">
 </head>
 <body>
-    <h1><%= market %></h1>
-    <h2><%= left %></h2>
-    <h2><%= right %></h2>
+
+    <div class="main-nav">
+        <% include navbar %>
+    </div>
+
+    <div class="form-wrapper">
+        <form id= "form1" action="javascript:void(0);">
+            <div class="autocomplete" style="width:300px;">
+                <input id="myInput" type="text" >
+          </div>
+      <input id= "addbutton" type="submit" value="Add &#43;">
+      <input id= "removebutton" type="submit" value="Remove &#45;">
+        </form>
+    <h1 id="mname"><%= market %></h1>
+    <div class="message-box" style="display: inline-block;"></div>
+    <div id="svg-wrapper"></div>
 </body>
+
+
+<!-- Scripts -->
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+<script src='/js/database-wrapper.js'></script>
+<script src='/js/graph.js'></script>
+
 </html>

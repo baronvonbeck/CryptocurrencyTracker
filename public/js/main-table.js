@@ -10,8 +10,19 @@
  *          Right: AAA->BBB->CCC->AAA
  */
 
+// Refresh rate
+const REFRESH = 2000;
+
 // main associative array to hold data per market name (e.g. "BTC-LTC")
 var marketSummaries = {};
+
+// coin images
+var coinImageReturn = {};
+var coinImages = {};
+var evalCoinImageURLs = false;
+//const loadingImagePath = 'http://placecorgi.com/32/32';
+const loadingImagePath = "../img/load.gif";
+const COINS = '/coins';
 
 // 2D array to convert one coin into another
 // newcoin = oldcoin * conversions[old coin symbol][new coin symbol];
@@ -21,7 +32,7 @@ var conversions = {};
  * Markets the user can start and end on. These are the only ones currently
  * supported in conjunction with many others via Bittrex's API
  */
-var validMarkets =  {
+const validMarkets =  {
     "BTC"   : true,
     "ETH"   : true,
     "USDT"  : true,
@@ -37,7 +48,7 @@ var previousMarkets = [];
 var selectedSortMethod = 2;
 
 // array of supported sorting methods
-var sortMethods = [
+const sortMethods = [
     aToZ,
     zToA,
     descending,
@@ -58,217 +69,184 @@ const fee = 0.992518734375;
 // maintain track of what rows are highlighted in the main table
 var highlightedMarkets = {};
 
-// Routes - MarketChainNames
-const POST_VALID_MARKET = '/putvalidmarket';
-const GET_MARKET_NAMES = '/getmarketnames/';
-const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
-
 // Routes - Bittrex
 const MARKET_SUMMARIES = '/marketsummaries';
 
-// Routes - MarketChainData
-const POST_DATA_FOR_MARKET = '/putdataformarket';
-const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/';
 
 
 $(document).ready(function() {
-     initialize();
+    grabCoins();
+    initialize();
 
-     setInterval(function() {
-         update();
-     }, 2000);
+    setInterval(function() {
+        update();
+    }, REFRESH);
 });
 
 
-// Posts the data for a given market at a given timestamp
-function postMarketData(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_DATA_FOR_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for data post for: " + marketData.MarketChainName);
-         })
-     });
-}
-
-
-// Gets the data for a given market between the times starttime and endtime
-function getMarketDataForMarketInRange(marketData) {
+// Request to grab all the coins
+function grabCoins() {
     $.ajax({
-        url: GET_DATA_FOR_MARKET_IN_RANGE + marketData.marketname + "." + marketData.start + "." + marketData.end,
-        async: true,
-        success: (function(data) {
-            console.log(data);
-            data.Items.forEach(function(item) {
-                console.log("Got chain name: " + item.MarketChainName.S + " - " + item.LeftVal.N + " - " + item.RightVal.N + " - " + item.DataTimestamp.S);
-            });
-        })
+        url: COINS,
+        success: function (data) {
+            coinImageReturn = data;
+            evalCoinImageURLs = true;
+        }
     });
 }
 
 
-// Gets all of the valid market names we collect data on graphs for. This list is updated on the back end periodically and automatically
-function getMarketNamesForMarket(name) {
-    $.ajax({
-        url: GET_MARKET_NAMES + name,
-        async: true,
-        success: (function(data) {
-            console.log("Got chain name: " + data.Item.MarketChainName.S + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
-
-        })
-    });
-}
-
-
-// Gets the market name, the left market name, and the right market name for an individual market for use for displaying on graphs
-function getAllValidMarketNames() {
-    $.ajax({
-        url: GET_ALL_VALID_MARKET_NAMES,
-        async: true,
-        dataType: 'json',
-        success: (function(data) {
-            console.log("Got all Market Chain Names");
-            data.Items.forEach(function(item) {
-                console.log(" -", item.MarketChainName.S);
-            });
-        })
-    });
-}
-
-
-// Posts a valid market and its corresponding left and right names into dynamoDB
-function postValidMarket(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_VALID_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
-         })
-     });
-}
-
-
+// creates main table
 function initialize() {
 
-     // Bittrex API: get summary of all market exchanges
-     // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
-     $.ajax({
-         url: MARKET_SUMMARIES,
-         success: (function (data) {
-             if (data.result === null ) {
-                 console.log("Failed 'getMarketSummaries()'");
-                 return;
-             }
+    // Bittrex API: get summary of all market exchanges
+    // put each summary into an associate array with market name as key (e.g. "BTC-LTC")
 
-             getValidMarketConversions(data.result);
-             findValidConversionChains();
-             calculateMarketValues();
-             sortMarkets(selectedSortMethod);
+    $.ajax({
+        url: MARKET_SUMMARIES,
+        success: (function (data) {
+            if (data.result === null ) {
+                console.log("Failed 'getMarketSummaries()'");
+                return;
+            }
 
-             // iterate through market chains to create html table
-             for (var i = 0; i < currentMarkets.length; i ++) {
+            getValidMarketConversions(data.result);
+            findValidConversionChains();
+            calculateMarketValues();
+            sortMarkets(selectedSortMethod);
 
-                 var market = currentMarkets[i];
-                 highlightedMarkets[market.name] = false;
+            // iterate through market chains to create html table
+            for (var i = 0; i < currentMarkets.length; i ++) {
 
-                 var selectIDLeft = i + "-LEFT";
-                 var selectIDRight = i + "-RIGHT";
-                 var selectID = i + "-MARKET";
+                var market = currentMarkets[i];
+                highlightedMarkets[market.name] = false;
+                var selectIDLeft = i + "-LEFT";
+                var selectIDRight = i + "-RIGHT";
+                var selectID = i + "-MARKET";
 
-                 $("#main-table").append(
-                     '<tr class="trow">' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>'+
-                     '<td class="market" id=' + selectID + '>' + market.name + '</td>' +
-                     '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
-                     '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
-                     '</tr>'
-                 );
-             }
+                /*
+                postValidMarket({
+                    "MarketChainName": market.name,
+                    "MarketLeftName": market.leftname,
+                    "MarketRightName": market.rightname
+                });
+                */
 
-             activateHighlightCallback();
-             activateSortDropdownCallback();
+                $("#main-table").append(
+                    '<tr class="trow">' +
 
-             // make reference to a deep copy
-             previousMarkets = currentMarkets.slice(0);
-         })
-     });
+                    '<td class="market" id=' + selectID + '>' + '<div class="avatar-container">' +
+                    '<img src="' + loadingImagePath + '" class="td-avatar"/>' +
+                    '<img src="' + loadingImagePath + '" class="td-avatar"/>' +
+                    '<img src="' + loadingImagePath + '" class="td-avatar"/>' +
+                    '</div>' +  "<a href=/g/" + market.name + ">" + market.name + "</a>" + '</td>' +
+                    '<td class="left" id=' + selectIDLeft + '>' + market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font></td>' +
+                    '<td class="right" id=' + selectIDRight + '>' + market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font></td>' +
+                    '</tr>'
+                );
+            }
+
+            activateHighlightCallback();
+            activateSortDropdownCallback();
+
+            // make reference to a deep copy
+            previousMarkets = currentMarkets.slice(0);
+        })
+    });
 }
 
 
+// updates table every few seconds
 function update() {
-     $.ajax({
-         url: MARKET_SUMMARIES,
-         success: (function (data) {
-             if (data.result === null) {
-                 console.log("Failed 'getMarketSummaries()'");
-                 return;
-             }
 
-             getValidMarketConversions(data.result);
-             findValidConversionChains();
-             calculateMarketValues();
-             sortMarkets(selectedSortMethod);
+    $.ajax({
+        url: MARKET_SUMMARIES,
+        success: (function (data) {
+            if (data.result === null) {
+                console.log("Failed 'getMarketSummaries()'");
+                return;
+            }
 
-             if (paused) {
-                 currentMarkets = previousMarkets.slice(0);
-             }
+            getValidMarketConversions(data.result);
+            findValidConversionChains();
+            calculateMarketValues();
+            sortMarkets(selectedSortMethod);
 
-             // iterate through market chains to update html table
-             for (var i = 0; i < currentMarkets.length; i ++) {
-                 var market = currentMarkets[i];
-                 var selectIDLeft = "#" + i + "-LEFT";
-                 var selectIDRight = "#" + i + "-RIGHT";
-                 var selectID = "#" + i + "-MARKET";
+            if (paused) {
+                currentMarkets = previousMarkets.slice(0);
+            }
 
-                 $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
+            // iterate through market chains to update html table
+            for (var i = 0; i < currentMarkets.length; i ++) {
+                var market = currentMarkets[i];
+                var selectIDLeft = "#" + i + "-LEFT";
+                var selectIDRight = "#" + i + "-RIGHT";
+                var selectID = "#" + i + "-MARKET";
 
-                 $(selectID).html(
-                     '<div class="avatar-container">' +
-                    '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '<img src="http://placecorgi.com/32/32" class="td-avatar"/>' +
-                     '</div>' +
-                     "<a href=#" + market.name + ">" + market.name + "</a>"
-                 );
-                 $(selectIDLeft).html(
-                     market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font>'
-                 );
-                 $(selectIDRight).html(
-                     market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font>'
-                 );
+                $("#main-table tr:nth-child(" + (i + 2) + ")" ).removeClass("selected");
 
-                 if (highlightedMarkets[market.name] == true) {
-                     $("#main-table tr:nth-child(" + (i + 2) + ")" ).addClass("selected");
-                 }
-             }
+                if (evalCoinImageURLs && Object.keys(coinImageReturn).length > 0) {
 
-             previousMarkets = currentMarkets.slice(0);
-         })
-     });
+                    if (coinImageReturn[market.a] != undefined)
+                        coinImages[market.a] = 'https://www.cryptocompare.com' + coinImageReturn[market.a] + "?width=32";
+
+                    if (coinImageReturn[market.b] != undefined)
+                        coinImages[market.b] = 'https://www.cryptocompare.com' + coinImageReturn[market.b] + "?width=32";
+
+                    if (coinImageReturn[market.c] != undefined)
+                        coinImages[market.c] = 'https://www.cryptocompare.com' + coinImageReturn[market.c] + "?width=32";
+
+                    if (i == currentMarkets.length - 1) {
+                        coinImageReturn = {};
+                        evalCoinImageURLs = false;
+                    }
+                }
+
+                var marketAImageURL = (coinImages[market.a] != undefined) ? coinImages[market.a] : loadingImagePath;
+                var marketBImageURL = (coinImages[market.b] != undefined) ? coinImages[market.b] : loadingImagePath;
+                var marketCImageURL = (coinImages[market.c] != undefined) ? coinImages[market.c] : loadingImagePath;
+
+                $(selectID).html(
+                    '<div class="avatar-container">' +
+                    '<img src="' + marketAImageURL + '" class="td-avatar"/>' +
+                    '<img src="' + marketBImageURL + '" class="td-avatar"/>' +
+                    '<img src="' + marketCImageURL + '" class="td-avatar"/>' +
+                    '</div>' +
+                    "<a href=/g/" + market.name + ">" + market.name + "</a>"
+                );
+
+                $(selectIDLeft).html(
+                    market.leftname + "<br>" + ((market.left < 1) ? '<font color="red">' : '<font color="turquoise">') + market.left + '</font>'
+                );
+                $(selectIDRight).html(
+                    market.rightname + "<br>" + ((market.right < 1) ? '<font color="red">' : '<font color="turquoise">') + market.right + '</font>'
+                );
+
+                if (highlightedMarkets[market.name] == true) {
+                    $("#main-table tr:nth-child(" + (i + 2) + ")" ).addClass("selected");
+                }
+            }
+
+            previousMarkets = currentMarkets.slice(0);
+        })
+    });
 }
 
 
- /*
-  * Get all possible market conversions between 2 different currencies
-  */
+/*
+ * Get all possible market conversions between 2 different currencies
+ */
 function getValidMarketConversions(reference) {
-     // iterate through markets and put them each into an array
-     for (var i = 0; i < reference.length; i ++) {
 
-         // ignore invalid/empty markets
-         if (reference[i].Bid <= 0)
-             continue;
+    // iterate through markets and put them each into an array
+    for (var i = 0; i < reference.length; i ++) {
 
-         marketSummaries[reference[i].MarketName] = reference[i];
-     }
+        // ignore invalid/empty markets
+        if (reference[i].Bid <= 0)
+            continue;
+
+        marketSummaries[reference[i].MarketName] = reference[i];
+    }
 }
 
 
@@ -278,6 +256,7 @@ function getValidMarketConversions(reference) {
  * listed in validMarkets.
  */
 function findValidConversionChains() {
+
     markets = [];
     var exists = {};
 
@@ -343,6 +322,15 @@ function calculateMarketValues() {
         market.right =  conversions[market.a][market.b] *
                         conversions[market.b][market.c] *
                         conversions[market.c][market.a] * fee;
+
+        /*
+        postMarketData({
+            "MarketChainName": market.name,
+            "RightVal": market.right,
+            "LeftVal": market.left,
+            "DataTimestamp": Date.now()
+        });
+        */
     }
 }
 
@@ -351,6 +339,7 @@ function calculateMarketValues() {
  * Sorts using the function in sortMethods at index paramater passed in
  */
 function sortMarkets(index) {
+
     currentMarkets = markets.slice(0);
 
     currentMarkets.sort(function(a, b) {
@@ -362,10 +351,12 @@ function sortMarkets(index) {
 /*****************************************************************************
  * Callback Functions ----- START ------
  *****************************************************************************/
+
 /*
  * Callback function for pausing
  */
 function pauseCallback() {
+
     if (paused) $('#pause-button').html("&#10074;&#10074;");
     else $('#pause-button').html("&#9658;");
     paused = !paused;
@@ -376,6 +367,7 @@ function pauseCallback() {
  * Callback function for highlighting clicked rows
  */
 function activateHighlightCallback() {
+
     $('#main-table .trow').click(function() {
         var marketName = $(this).children()[0].innerText;
 
@@ -393,6 +385,7 @@ function activateHighlightCallback() {
  * Callback function for getting sort dropdown value
  */
 function activateSortDropdownCallback() {
+
     $("#sort-methods").change(function() {
         selectedSortMethod = $(this).val();
     });
@@ -406,10 +399,10 @@ function activateSortDropdownCallback() {
  * Sorting Comparator Functions ----- START ------
  *****************************************************************************/
 function aToZ(x, y) {
-     var xlower = x.name.toLowerCase();
-     var ylower = y.name.toLowerCase();
+    var xlower = x.name.toLowerCase();
+    var ylower = y.name.toLowerCase();
 
-     return xlower < ylower ? -1 : xlower > ylower ? 1 : 0;
+    return xlower < ylower ? -1 : xlower > ylower ? 1 : 0;
 }
 
 

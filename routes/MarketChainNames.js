@@ -49,7 +49,8 @@ router.get(GET_MARKET_NAMES, function(req, res) {
         TableName: ddbTable,
         Key: {
             "MarketChainName": { "S": req.params.marketchainname }
-        }
+        },
+        ProjectionExpression: "MarketLeftName, MarketRightName"
     }
 
     ddb.getItem(params, function(err, data) {

@@ -6,9 +6,11 @@ const fs = require('fs');
 
 var ABOUT = '/about';
 var BITTREX = 'https://bittrex.com/api/v1.1/public/';
+var COINS = '/coins';
+var CRYPTOCOINLIST = "https://min-api.cryptocompare.com/data/all/coinlist";
 var CONTACT = '/contact';
-var GRAPH = '/g/:market.:left.:right';
-var GRAPHS = '/graphs';
+var GRAPH = '/g/:market';
+var GRAPHS = '/g/';
 var MARKETS = '/markets';
 var MARKETS_M = MARKETS + '/:market';
 var MARKETSUMMARIES = '/marketsummaries';
@@ -27,12 +29,24 @@ router.get(CONTACT, (req, res) => {
 });
 
 router.get(GRAPHS, (req,res) => {
-    res.render('graphs.ejs');
+    res.render('graph.ejs', {market: ""});
 });
 
 router.get(GRAPH, (req, res) => {
     //res.send(req.params)
     res.render('graph.ejs', req.params);
+});
+
+// Get cryptocompare coin list for image URLs
+router.get(COINS, (req, res) => {
+    request(CRYPTOCOINLIST, function(error, response, body) {
+        var hold = JSON.parse(JSON.stringify(eval('(' + body + ')')));
+        var result = {};
+        Object.keys(hold["Data"]).forEach( function(key) {
+            result[key] = hold["Data"][key].ImageUrl;
+        })
+        res.json(result);
+    });
 });
 
 // Get available markets
