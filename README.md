@@ -22,7 +22,7 @@ Use the two scripts in the /scripts subdirectory to create the necessary tables 
     * node ./scripts/createMarketChainDataTable.js
     * node ./scripts/createMarketChainNamesTable.js
 
-We included POST methods that you can use to generate your own data in your local DynamoDB environment. Uncomment out the postMarketNames and postMarketData function definitions in database-wrapper.js and calls in main-table.js to generate data.
+We included POST methods that you can use to generate your own data in your local DynamoDB environment. Uncomment out the postValidMarket and postMarketData function definitions in database-wrapper.js and calls in main-table.js to generate data. These will put data into the above tables.
 
 In the directory where the repository is, run either   
 
@@ -34,5 +34,5 @@ Now, navigate to the following URL : http://localhost:3000
 The default URL is set to localhost with port 3000.
 
 ## TODO
-    * Test on production AWS
-    * Continue writing a better README :)
+    * Get constant domain name
+    * Run lambda functions
