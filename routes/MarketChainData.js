@@ -14,33 +14,8 @@ AWS.config.update({
 
 const ddb = new AWS.DynamoDB();
 const ddbTable = 'MarketChainData';
-const POST_DATA_FOR_MARKET = '/putdataformarket';
-const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/:marketchainname.:start.:end';
-
-
-// Posts the data for a given market at a given timestamp
-router.post(POST_DATA_FOR_MARKET, function(req, res) {
-    var params = {
-        TableName: ddbTable,
-        Item: {
-            "MarketChainName": { "S": req.body.MarketChainName },
-            "LeftVal": { "N": req.body.RightVal.toString() },
-            "RightVal": { "N": req.body.LeftVal.toString() },
-            "DataTimestamp": { "S": req.body.DataTimestamp.toString() }
-        }
-    }
-
-    ddb.putItem(params, function(err, data) {
-        if (err) {
-            console.log("Error while inserting data for market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
-        }
-        else {
-            console.log("Successfully inserted market chain data for: " + req.body.MarketChainName);
-        }
-    });
-
-    res.end();
-});
+const POST_DATA_FOR_MARKET = '/api/dev/putdataformarket';
+const GET_DATA_FOR_MARKET_IN_RANGE = '/api/getdataformarketinrange/:marketchainname.:start.:end';
 
 
 // Gets the data for a given market between the times starttime and endtime
@@ -69,6 +44,36 @@ router.get(GET_DATA_FOR_MARKET_IN_RANGE, function(req, res) {
         }
     });
 });
+
+
+/****************************************************************************************************
+ ***** LOCAL DEVELOPMENT ONLY - NOT USED IN APPLICATION *****
+ ****************************************************************************************************
+ 
+// Posts the data for a given market at a given timestamp
+router.post(POST_DATA_FOR_MARKET, function(req, res) {
+    var params = {
+        TableName: ddbTable,
+        Item: {
+            "MarketChainName": { "S": req.body.MarketChainName },
+            "LeftVal": { "N": req.body.RightVal.toString() },
+            "RightVal": { "N": req.body.LeftVal.toString() },
+            "DataTimestamp": { "S": req.body.DataTimestamp.toString() }
+        }
+    }
+
+    ddb.putItem(params, function(err, data) {
+        if (err) {
+            console.log("Error while inserting data for market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
+        }
+        else {
+            console.log("Successfully inserted market chain data for: " + req.body.MarketChainName);
+        }
+    });
+
+    res.end();
+});
+*/
 
 
 module.exports = router;

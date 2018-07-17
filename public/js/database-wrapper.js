@@ -5,13 +5,13 @@
  */
 
 // Routes - MarketChainNames
-const POST_VALID_MARKET = '/putvalidmarket';
-const GET_MARKET_NAMES = '/getmarketnames/';
-const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
+const POST_VALID_MARKET = '/api/dev/putvalidmarket';
+const GET_MARKET_NAMES = '/api/getmarketnames/';
+const GET_ALL_VALID_MARKET_NAMES = '/api/getallvalidmarketnames';
 
 // Routes - MarketChainData
-const POST_DATA_FOR_MARKET = '/putdataformarket';
-const GET_DATA_FOR_MARKET_IN_RANGE = '/getdataformarketinrange/';
+const POST_DATA_FOR_MARKET = '/api/dev/putdataformarket';
+const GET_DATA_FOR_MARKET_IN_RANGE = '/api/getdataformarketinrange/';
 
 
 

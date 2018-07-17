@@ -16,46 +16,88 @@
 
 /* nav styles */
 .main-nav nav {
-  font-family: 'Titillium Web', sans-serif;
-  font-weight: light;
-  display: flex;
-  text-align: center;
-  position: relative;
-  background-color: #1D1E2C;
-  justify-content: center;
+    font-family: 'Titillium Web', sans-serif;
+    font-weight: light;
+    display: flex;
+    text-align: center;
+    position: relative;
+    background-color: #1D1E2C;
+    justify-content: center;
+    min-width: 480px;
+
+    overflow:hidden;
 }
 
 .main-nav nav a {
-  color: white;
-  font-size: 1.7em;
-  align-items: center;
+    color: white;
+    font-size: 1.7em;
+    align-items: center;
 
-  padding: 10px 40px;
-  background-color: none;
-  position: relative;
-  text-decoration: none;
-  /* BCC1BA */
+    padding: 10px 25px;
+    background-color: none;
+    position: relative;
+    text-decoration: none;
+    /* BCC1BA */
+
+    display: block;
 }
 
 .main-nav nav a::after {
-  content: '';
-  position: absolute;
-  bottom: 4px ;
-  left: 0;
-  width: 100%;
-  height: 2.5px;
-  background-color: #BCC1BA;
-  transform: scaleX(0);
-  transition: all .2s linear;
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 100%;
+    height: 2.5px;
+    background-color: #BCC1BA;
+    transform: scaleX(0);
+    transition: all .2s linear;
 }
 
 .main-nav nav a:hover {
-  color: #EDD39C;
+    color: #EDD39C;
 }
 
 .main-nav nav a:hover::after {
-  transform: scaleX(1);
+    transform: scaleX(1);
 }
+
+.main-nav nav .icon {
+    display: none;
+    position: absolute;
+    right: 0;
+}
+
+
+@media screen and (max-width: 600px) {
+    .main-nav nav a:not(:first-child) {display: none;}
+    .main-nav nav a.icon {
+         float: right;
+         display: block;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .main-nav nav.responsive {
+        position: relative;
+        display: block;
+    }
+    .main-nav nav.responsive a.icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    .main-nav nav.responsive a {
+        float: none;
+        display: block;
+        align-items: center;
+    }
+    .main-nav nav.responsive a::after {
+        width: 30%;
+        left: 34vw;
+    }
+}
+
 
 /* wrappers */
 .main-title {

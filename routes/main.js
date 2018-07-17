@@ -6,14 +6,14 @@ const fs = require('fs');
 
 var ABOUT = '/about';
 var BITTREX = 'https://bittrex.com/api/v1.1/public/';
-var COINS = '/coins';
+var COINS = '/api/coins';
 var CRYPTOCOINLIST = "https://min-api.cryptocompare.com/data/all/coinlist";
 var CONTACT = '/contact';
 var GRAPH = '/g/:market';
 var GRAPHS = '/g/';
-var MARKETS = '/markets';
+var MARKETS = '/api/markets';
 var MARKETS_M = MARKETS + '/:market';
-var MARKETSUMMARIES = '/marketsummaries';
+var MARKETSUMMARIES = '/api/marketsummaries';
 
 // API
 router.get('/', (req, res) => {

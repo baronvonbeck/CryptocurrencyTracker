@@ -14,33 +14,11 @@ AWS.config.update({
 
 const ddb = new AWS.DynamoDB();
 const ddbTable = 'MarketChainNames';
-const POST_VALID_MARKET = '/putvalidmarket';
-const GET_MARKET_NAMES = '/getmarketnames/:marketchainname';
-const GET_ALL_VALID_MARKET_NAMES = '/getallvalidmarketnames';
+const POST_VALID_MARKET = '/api/dev/putvalidmarket';
+const GET_MARKET_NAMES = '/api/getmarketnames/:marketchainname';
+const GET_ALL_VALID_MARKET_NAMES = '/api/getallvalidmarketnames';
 
 
-// Posts a valid market and its corresponding left and right names into dynamoDB
-router.post(POST_VALID_MARKET, function(req, res) {
-    var params = {
-        TableName: ddbTable,
-        Item: {
-            "MarketChainName": { "S": req.body.MarketChainName },
-            "MarketLeftName": { "S": req.body.MarketLeftName },
-            "MarketRightName": { "S": req.body.MarketRightName }
-        }
-    }
-
-    ddb.putItem(params, function(err, data) {
-        if (err) {
-            console.log("Error while inserting market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
-        }
-        else {
-            console.log("Successfully inserted market chain name: " + req.body.MarketChainName);
-        }
-    });
-
-    res.end();
-});
 
 
 // Gets the market name, the left market name, and the right market name for an individual market for use for displaying on graphs
@@ -95,5 +73,33 @@ router.get(GET_ALL_VALID_MARKET_NAMES, function(req, res) {
     }
 });
 
+
+/****************************************************************************************************
+ ***** LOCAL DEVELOPMENT ONLY - NOT USED IN APPLICATION *****
+ ****************************************************************************************************
+ 
+// Posts a valid market and its corresponding left and right names into dynamoDB
+router.post(POST_VALID_MARKET, function(req, res) {
+    var params = {
+        TableName: ddbTable,
+        Item: {
+            "MarketChainName": { "S": req.body.MarketChainName },
+            "MarketLeftName": { "S": req.body.MarketLeftName },
+            "MarketRightName": { "S": req.body.MarketRightName }
+        }
+    }
+
+    ddb.putItem(params, function(err, data) {
+        if (err) {
+            console.log("Error while inserting market chain name " + req.body.MarketChainName + ": " + JSON.stringify(err, null, 2) );
+        }
+        else {
+            console.log("Successfully inserted market chain name: " + req.body.MarketChainName);
+        }
+    });
+
+    res.end();
+});
+*/
 
 module.exports = router;

@@ -22,7 +22,7 @@ var coinImages = {};
 var evalCoinImageURLs = false;
 //const loadingImagePath = 'http://placecorgi.com/32/32';
 const loadingImagePath = "../img/load.gif";
-const COINS = '/coins';
+const COINS = '/api/coins';
 
 // 2D array to convert one coin into another
 // newcoin = oldcoin * conversions[old coin symbol][new coin symbol];
@@ -70,7 +70,7 @@ const fee = 0.992518734375;
 var highlightedMarkets = {};
 
 // Routes - Bittrex
-const MARKET_SUMMARIES = '/marketsummaries';
+const MARKET_SUMMARIES = '/api/marketsummaries';
 
 
 

@@ -22,7 +22,7 @@ Use the two scripts in the /scripts subdirectory to create the necessary tables 
     * node ./scripts/createMarketChainDataTable.js
     * node ./scripts/createMarketChainNamesTable.js
 
-We included POST methods that you can use to generate your own data in your local DynamoDB environment. Uncomment out the postValidMarket and postMarketData function definitions in database-wrapper.js and calls in main-table.js to generate data. These will put data into the above tables.
+We included POST methods that you can use to generate your own data in your local DynamoDB environment. Uncomment out the postValidMarket and postMarketData function definitions in database-wrapper.js, their corresponding routes in MarketChainNames.js and MarketChainData.js, and their calls in main-table.js to generate data. These will put data into the above tables.
 
 In the directory where the repository is, run either   
 
