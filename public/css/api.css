@@ -18,13 +18,13 @@ h1 {
 }
 
 h2 {
-    font-size: 2em;
-    text-align: center;
+    font-size: 1.4em;
+    text-align: left;
     font-family: 'Ubuntu', sans-serif;
     font-weight: lighter;
     background-color: #2D232E;
     color: white;
-    padding: 30px;
+    padding: 15px 30px;
     margin: 0 auto;
     width: 75%;
     border-radius: 5px;
@@ -32,7 +32,7 @@ h2 {
     border-bottom-right-radius: 0;
 }
 p {
-    padding: 40px 30px;
+    padding: 15px 30px;
     font-size: 1.1em;
     line-height: 2em;
     letter-spacing: 0.1em;

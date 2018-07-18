@@ -4,16 +4,18 @@ const request = require('request');
 const fs = require('fs');
 
 
-var ABOUT = '/about';
-var BITTREX = 'https://bittrex.com/api/v1.1/public/';
-var COINS = '/api/coins';
-var CRYPTOCOINLIST = "https://min-api.cryptocompare.com/data/all/coinlist";
-var CONTACT = '/contact';
-var GRAPH = '/g/:market';
-var GRAPHS = '/g/';
-var MARKETS = '/api/markets';
-var MARKETS_M = MARKETS + '/:market';
-var MARKETSUMMARIES = '/api/marketsummaries';
+const ABOUT = '/about';
+const API = '/api';
+const BITTREX = 'https://bittrex.com/api/v1.1/public/';
+const COINS = '/api/coins';
+const CRYPTOCOINLIST = "https://min-api.cryptocompare.com/data/all/coinlist";
+const CONTACT = '/contact';
+const GRAPH = '/g/:market';
+const GRAPHS = '/g/';
+const MARKETS = '/api/markets';
+const MARKETS_M = MARKETS + '/:market';
+const MARKETSUMMARIES = '/api/marketsummaries';
+
 
 // API
 router.get('/', (req, res) => {
@@ -22,6 +24,10 @@ router.get('/', (req, res) => {
 
 router.get(ABOUT, (req, res) => {
     res.render('about');
+});
+
+router.get(API, (req, res) => {
+    res.render('api');
 });
 
 router.get(CONTACT, (req, res) => {

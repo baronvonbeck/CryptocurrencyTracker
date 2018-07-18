@@ -34,6 +34,8 @@ router.get(GET_MARKET_NAMES, function(req, res) {
     ddb.getItem(params, function(err, data) {
         if (err) {
             console.log("Unable to scan market names for market. Error JSON: ", JSON.stringify(err, null, 2));
+
+            res.json(err);
         }
         else {
             console.log("Got market names for " + req.params.marketchainname + " successfully");
@@ -56,6 +58,8 @@ router.get(GET_ALL_VALID_MARKET_NAMES, function(req, res) {
     function onScan(err, data) {
         if (err) {
             console.error("Unable to scan the MarketChainNames table for all valid markets. Error JSON: ", JSON.stringify(err, null, 2));
+
+            res.json(err);
         }
         else {
             console.log("MarketChainNames scan for all names succeeded.");

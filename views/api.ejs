@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<!-- <html lang="en-us"> -->
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cryptocurrency Chain Tracker</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nova+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="./css/api.css" type="text/css" />
+</head>
+
+<body>
+    <div class="main-nav">
+        <% include navbar %>
+    </div>
+    <h1>API</h1>
+
+    <h2>/api/getdataformarketinrange/market-chain-name.start-timestamp.end-timestamp</h2>
+    <p>
+        Call to DynamoDB to get the data for a market chain from start-timestamp to end-timestamp inclusive, UNIX Epoch time. This is used on the graph page to create each graph. Set start-timestamp = end-timestamp to get a single particular value. New values for each market chain are currently inserted every 5 minutes; we can run every second, but we would quickly exceed the AWS free tier to store all of that data, so we throttled it down to every 5 minutes.<br><br>
+
+        <u>Example request</u>: <br>
+        <strong>https://cryptocurrencymarketchains.com/api/getdataformarketinrange/BTC_ADX_ETH.1531637407871.1531637828209</strong><br><br>
+
+        <u>Example successful response</u>: <br>
+        {<br>
+        &emsp; "Items":<br>
+        &emsp; [<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "DataTimestamp": {"S": "1531637407871"},<br>
+        &emsp; &emsp; &emsp; "LeftVal": {"N": "0.9853717099250611"},<br>
+        &emsp; &emsp; &emsp; "RightVal": {"N": "0.9773026902824927"}<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "DataTimestamp": {"S": "1531637761612"},<br>
+        &emsp; &emsp; &emsp; "LeftVal": {"N": "0.9866174808523762"},<br>
+        &emsp; &emsp; &emsp; "RightVal": {"N": "0.9773380234527068"}<br>
+        &emsp; &emsp; }, <br>
+        &emsp; &emsp; ... <br>
+        &emsp; ],<br>
+        &emsp; "Count": 4,<br>
+        &emsp; "ScannedCount": 4<br>
+        }<br><br>
+
+        <u>Example failed response</u> (start-timestamp occurrs after end-timestamp):<br>
+        {<br>
+        &emsp; "message": "Invalid KeyConditionExpression: The BETWEEN operator requires upper bound to be greater than or equal to lower bound; lower bound operand: AttributeValue: {S:1531637828209}, upper bound operand: AttributeValue: {S:1531637407871}",<br>
+        &emsp; "code": "ValidationException",<br>
+        &emsp; "time": "2018-07-18T03:13:32.649Z",<br>
+        &emsp; "requestId": "SG9E4SOVUQP4QVM7ST8U0VCA8NVV4KQNSO5AEMVJF66Q9ASUAAJG", <br>
+        &emsp; "statusCode": 400, <br>
+        &emsp; "retryable": false, <br>
+        &emsp; "retryDelay": 24.32307610270209<br>
+        }
+    </p>
+
+    <h2>/api/getallvalidmarketnames</h2>
+    <p>
+        Call to DynamoDB to get all of the valid market chains. This is used on the graph page to populate the drop down for selecting and adding/removing new graphs. The values are updated and new values are added by a background Lambda function running once a day.<br><br>
+
+        <u>Example request</u>: <br>
+        <strong>https://cryptocurrencymarketchains.com/api/getallvalidmarketnames</strong><br><br>
+
+        <u>Example successful response</u>:<br>
+        {<br>
+        &emsp; "Items":<br>
+        &emsp; [<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketChainName": {"S": "BTC_ENG_ETH"}<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketChainName": {"S": "BTC_MCO_ETH"}<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketChainName": {"S": "BTC_ANT_ETH"}<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; ... <br>
+        &emsp; ],<br>
+        &emsp; "Count": 100,<br>
+        &emsp; "ScannedCount": 100<br>
+        }<br><br>
+
+        Should not fail.
+    </p>
+
+    <h2>/api/getmarketnames/market-chain-name</h2>
+    <p>
+        Call to DynamoDB to get the "left" and "right" names for a given market chain. Used on the graph page in the legend for each graph. For example, if you are looking for the left and right names for BTC_ADX_ETH, the corresponding left name would be BTC_ETH_ADX_BTC (transfer from BTC to ETH to ADX and then back to BTC), and the corresponding right name woud be BTC_ADX_ETH_BTC (transfer from BTC to ADX to ETH and back to BTC.<br><br>
+
+        <u>Example request</u>:<br>
+        <strong>https://cryptocurrencymarketchains.com/api/getmarketnames/BTC_ADX_ETH</strong><br><br>
+
+        <u>Example successful response</u>:<br>
+        {<br>
+        &emsp; "Item": <br>
+        &emsp; {<br>
+        &emsp; &emsp; "MarketLeftName": {"S":"BTC &#10236; ETH &#10236; ADX &#10236; BTC"},<br>
+        &emsp; &emsp; "MarketRightName": {"S":"BTC &#10236; ADX &#10236; ETH &#10236; BTC"}<br>
+        &emsp; }<br>
+        }<br><br>
+
+        <u>Example failed response</u> (returns nothing):<br>
+        {}
+    </p>
+
+    <h2>/api/marketsummaries</h2>
+    <p>
+        Call to <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a> to get the base market chain data (i.e. data for each of BTC_ETH and ETH_ADX and BTC_ADX), which is then used to calculate the left and right full chain values (in the previous example, going from BTC to ETH to ADX and then back to BTC or going from BTC to ADX to ETH and then back to BTC, respectively). Used on the main table page as described. Specifically, the Bid and Ask values are used.<br><br>
+
+        <u>Example request</u>: <br>
+        <strong>https://cryptocurrencymarketchains.com/api/marketsummaries</strong><br><br>
+
+        <u>Example successful response</u>:<br>
+        {<br>
+        &emsp; "success": true,<br>
+        &emsp; "message": "",<br>
+        &emsp; "result": <br>
+        &emsp; [<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketName": "BTC-2GIVE",<br>
+        &emsp; &emsp; &emsp; "High": 8.5e-7,<br>
+        &emsp; &emsp; &emsp; "Low": 7.4e-7,<br>
+        &emsp; &emsp; &emsp; "Volume": 1804755.21412444,<br>
+        &emsp; &emsp; &emsp; "Last":8.1e-7, "BaseVolume": 1.44646078,<br>
+        &emsp; &emsp; &emsp; "TimeStamp": "2018-07-17T06:57:34.57",<br>
+        &emsp; &emsp; &emsp; "Bid": 8.1e-7,<br>
+        &emsp; &emsp; &emsp; "Ask": 8.3e-7,<br>
+        &emsp; &emsp; &emsp; "OpenBuyOrders": 67,<br>
+        &emsp; &emsp; &emsp; "OpenSellOrders": 759,<br>
+        &emsp; &emsp; &emsp; "PrevDay": 8.2e-7,<br>
+        &emsp; &emsp; &emsp; "Created": "2016-05-16T06:44:15.287"<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketName": "BTC-ADA",<br>
+        &emsp; &emsp; &emsp; "High": 0.00002355,<br>
+        &emsp; &emsp; &emsp; "Low": 0.00002236,<br>
+        &emsp; &emsp; &emsp; "Volume": 29325268.86262015,<br>
+        &emsp; &emsp; &emsp; "Last": 0.00002258,<br>
+        &emsp; &emsp; &emsp; "BaseVolume": 675.42886093,<br>
+        &emsp; &emsp; &emsp; "TimeStamp": "2018-07-17T06:58:04.627",<br>
+        &emsp; &emsp; &emsp; "Bid": 0.00002258,<br>
+        &emsp; &emsp; &emsp; "Ask": 0.00002266,<br>
+        &emsp; &emsp; &emsp; "OpenBuyOrders": 3394,<br>
+        &emsp; &emsp; &emsp; "OpenSellOrders": 8154,<br>
+        &emsp; &emsp; &emsp; "PrevDay": 0.00002263,<br>
+        &emsp; &emsp; &emsp; "Created": "2017-09-29T07:01:58.873"<br>
+        &emsp; &emsp; }, <br>
+        &emsp; &emsp; ... <br>
+        &emsp; ]<br>
+        }<br><br>
+
+        Should not fail.
+    </p>
+
+    <h2>/api/markets</h2>
+    <p>
+        Call to <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a> to get all of the possible base market chains (for example, BTC-ETH and BTC-ADX and ETH-ADX) with which we can then get the left and right full chain names. Used on the main table (home) page as descibed.  <br><br>
+
+        <u>Example request</u>: <br>
+        <strong>https://cryptocurrencymarketchains.com/api/markets</strong><br><br>
+
+        <u>Example successful response</u>:<br>
+        {<br>
+        &emsp; "success": true,<br>
+        &emsp; "message": "",<br>
+        &emsp; "result":<br>
+        &emsp; [<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketCurrency": "LTC",<br>
+        &emsp; &emsp; &emsp; "BaseCurrency": "BTC",<br>
+        &emsp; &emsp; &emsp; "MarketCurrencyLong": "Litecoin",<br>
+        &emsp; &emsp; &emsp; "BaseCurrencyLong": "Bitcoin",<br>
+        &emsp; &emsp; &emsp; "MinTradeSize": 0.01435906,<br>
+        &emsp; &emsp; &emsp; "MarketName": "BTC-LTC",<br>
+        &emsp; &emsp; &emsp; "IsActive": true,<br>
+        &emsp; &emsp; &emsp; "Created": "2014-02-13T00:00:00",<br>
+        &emsp; &emsp; &emsp; "Notice": null,<br>
+        &emsp; &emsp; &emsp; "IsSponsored":null,<br>
+        &emsp; &emsp; &emsp; "LogoUrl": "https://bittrexblobstorage.blob.core.windows.net/public/6defbc41-582d-47a6-bb2e-d0fa88663524.png"<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; {<br>
+        &emsp; &emsp; &emsp; "MarketCurrency": "DOGE",<br>
+        &emsp; &emsp; &emsp; "BaseCurrency": "BTC",<br>
+        &emsp; &emsp; &emsp; "MarketCurrencyLong": "Dogecoin",<br>
+        &emsp; &emsp; &emsp; "BaseCurrencyLong": "Bitcoin",<br>
+        &emsp; &emsp; &emsp; "MinTradeSize": 396.82539683,<br>
+        &emsp; &emsp; &emsp; "MarketName": "BTC-DOGE",<br>
+        &emsp; &emsp; &emsp; "IsActive": true,<br>
+        &emsp; &emsp; &emsp; "Created": "2014-02-13T00:00:00",<br>
+        &emsp; &emsp; &emsp; "Notice": null,<br>
+        &emsp; &emsp; &emsp; "IsSponsored": null,<br>
+        &emsp; &emsp; &emsp; "LogoUrl": "https://bittrexblobstorage.blob.core.windows.net/public/a2b8eaee-2905-4478-a7a0-246f212c64c6.png"<br>
+        &emsp; &emsp; },<br>
+        &emsp; &emsp; ... <br>
+        &emsp; ]<br>
+        }<br><br>
+
+        Should not fail.
+    </p>
+
+    <h2>/api/markets/market</h2>
+    <p>
+        Call to <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a> to get the Bid and Ask values for a base market chain for use in calculating the full chain values. These values are also returned in /api/marketsummaries, so this individualized call is not used in our application.<br><br>
+
+        Example:<br>
+        <strong>https://cryptocurrencymarketchains.com/api/markets/BTC-LTC</strong><br><br>
+
+        <u>Example successful response</u>:<br>
+        {<br>
+        &emsp; "success": true,<br>
+        &emsp; "message": "",<br>
+        &emsp; "result":<br>
+        &emsp; {<br>
+        &emsp; &emsp; "Bid": 0.0123378,<br>
+        &emsp; &emsp; "Ask": 0.01233782,<br>
+        &emsp; &emsp; "Last": 0.01233782<br>
+        &emsp; }<br>
+        }<br><br>
+
+        <u>Example failed response</u>:<br>
+        {<br>
+        &emsp; "success": false,<br>
+        &emsp; "message": "INVALID_MARKET",<br>
+        &emsp; "result": null<br>
+        }
+    </p>
+
+    <h2>/api/coins</h2>
+    <p>
+        Call to <a href="https://www.cryptocompare.com/api">CryptoCompare's external API</a> to get the coin images for each individual coin (for example, BTC or LTC). The returned links are each appended to the external API url to get the images. Used on the main table (home) page to get the images for each coin.<br><br>
+
+        <u>Example request</u>:<br>
+        <strong>https://cryptocurrencymarketchains.com/api/coins</strong><br><br>
+
+        <u>Example successful response</u>:<br>
+        {<br>
+        &emsp; "42":"/media/12318415/42.png",<br>
+        &emsp; "300":"/media/27010595/300.png",<br>
+        &emsp; "365":"/media/352070/365.png",<br>
+        &emsp; "404":"/media/351001/404.png",<br>
+        &emsp; "611":"/media/350985/611.png",<br>
+        &emsp; "808":"/media/351513/808.png",<br>
+        &emsp; "888":"/media/351639/888.png",<br>
+        &emsp; "1337":"/media/350976/1337.png",<br>
+        &emsp; "2015":"/media/20180/2015.png",<br>
+        &emsp; "BTC":"/media/19633/btc.png",<br>
+        &emsp; "ETH":"/media/20646/eth_logo.png",<br>
+        &emsp; "LTC":"/media/19782/litecoin-logo.png", <br>
+        &emsp; ... <br>
+        }<br><br>
+
+        Should not fail.
+    </p>
+    
+</body>
+
+<!-- Scripts -->
+<script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+</html>

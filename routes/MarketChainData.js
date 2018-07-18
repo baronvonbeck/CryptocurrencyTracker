@@ -36,6 +36,8 @@ router.get(GET_DATA_FOR_MARKET_IN_RANGE, function(req, res) {
     ddb.query(params, function(err, data) {
         if (err) {
             console.log("Unable to query market data for market " + req.params.marketchainname + ". Error JSON: ", JSON.stringify(err, null, 2));
+
+            res.json(err);
         }
         else {
             console.log("MarketChainData query for " + req.params.marketchainname + " succeeded.");

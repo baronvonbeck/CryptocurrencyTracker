@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Crypto Chains</title>
+    <title>Cryptocurrency Chain Tracker</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet">
@@ -22,10 +22,19 @@
         <% include navbar %>
     </div>
     <h1>About</h1>
+
     <h2>Project Description</h2>
-    <p>Our goals for this site were to learn about AWS and its different offerings, strengthen our abilities with NodeJS, and implement a functional site pulling from both external API and our own back-end through analyzing trends in market chain exchange rates. The project takes the form of a table displaying both left and right "loops" of market chains like Bitcoin (BTC) and Ethereum (ETH). As an example, let us say we have the market: <strong>BTC_AAA_ETH</strong>. We would then have two loops. The left loop would look like <strong>BTC &rarr; ETH &rarr; AAA &rarr; BTC </strong>, and the right loop would look like <strong>BTC &rarr; AAA &rarr; ETH &rarr; BTC </strong>. <br><br>We simply calculate the exchange rates by looping to-and-from the origin market. In this case, our origin market is BTC. We see if exchanging currency, starting and ending with BTC, from <strong>ETH &rarr; AAA </strong> or <strong>AAA &rarr; ETH</strong> are profitable. A loop is profitable if we manage to find a ratio above 1.0 in the exchange rate after fees in either loop of a market.</p>
-    
-    
+    <p>
+        <strong><u> Overall goals</u></strong><br>
+    Our goals when creating this site were to learn about AWS and its different offerings, strengthen our abilities with NodeJS, and implement a functional site pulling from and integrating both external API and our own back-end. We did this through the scope of analyzing trends in market chain exchange rates. Our site is hosted on AWS EC2, fully integrated to GitHub with CodeDeploy, and utilizes DynamoDB and Lambda for the back-end functionality. Our API is described on the <a href="/api">API</a> page. Data is gathered from <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a>.<br><br>
+    <strong><u> Home Page</u></strong><br>
+    The <a href="/">Home</a> page of the site takes the form of a table displaying both left and right "loops" of market chains through more widely used coins like Bitcoin (BTC) and Ethereum (ETH). As an example, let us say we have the market: <strong>BTC_AAA_ETH</strong>. We would then have two market chain "loops". The left loop would look like <strong>BTC &rarr; ETH &rarr; AAA &rarr; BTC </strong>, and the right loop would look like <strong>BTC &rarr; AAA &rarr; ETH &rarr; BTC </strong>. We calculate the exchange rates by looping to-and-from the origin market using the relevant current bid and ask values, determined through <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a>. In this case, our origin market is BTC. We see if exchanging currency, starting and ending with BTC from <strong>BTC &rarr; AAA &rarr; ETH &rarr; BTC </strong> or <strong>BTC &rarr; ETH &rarr; AAA &rarr; BTC</strong>, is profitable. A loop is profitable if we manage to find a ratio above 1.0 in the exchange rate after fees in either loop of a market. When this occurrs, the ratio is in green text on the table; otherwise, the ratio is in red.<br><br>
+    Rows are initially sorted in absolute descending order of the market chain with the best exchange rate (left loop or right loop). You can also sort A to Z, Z to A, absolute ascending order, left loop descending/ascending, and right loop ascending/descending. Updates to the table occur every 2 seconds. You can use the pause button to stop updating the table, and the resume button to continue updating the table when paused. If you click anywhere on a row, it will be highlighted for you so in yellow so that you can track it more easily. Clicking that same row again will unhighlight it. Coin images are loaded from <a href="https://www.cryptocompare.com/api">CryptoCompare's external API</a>.<br><br>
+    <strong><u> Graph Page</u></strong><br>
+    You can navigate to the <a href="/g/">Graphs</a> page by clicking on either <a href="/g/">Graphs</a> in the navbar or by clicking on a market chain name underneath the coin images. Clicking on <a href="/g/">Graphs</a> in the navbar will take you to the page with nothing graphed yet; clicking on the market chain name under the coin images will take you to the page with that market chain's left and right loops already graphed.<br><br>
+    You can view new graphs by typing in your desired market chain into the search bar and clicking Add. All valid graph names are autofilled for you to choose, narrowing down as you type. Up to 5 different market chains, 10 total lines with left and right loops, can be added. To remove a market chain that you have graphed, type that chain name into the search bar and click Remove. The graph automatically updates every 10 seconds, but we have tested it to update every half second or less without issue.<br><br>
+    Data for graphs is stored on and retrieved from AWS DynamoDB. Background Lambda functions run periodically to update DynamoDB with snapshots of the values stored in the main table on the <a href="/">Home</a> page, and to catch when new market chains become available for display on graphs. The data snapshot Lambda function runs every five minutes, and the valid new market chain Lambda function runs once a day. We have tested each Lambda function to run with a granularity of one per second simultaneously without problem, but the cost we would invoke to store that data would quickly run us out of the free tier of AWS.
+    </p>
 </body>
 
 <!-- Scripts -->
