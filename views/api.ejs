@@ -28,7 +28,7 @@
         Call to DynamoDB to get the data for a market chain from start-timestamp to end-timestamp inclusive, UNIX Epoch time. This is used on the graph page to create each graph. Set start-timestamp = end-timestamp to get a single particular value. New values for each market chain are currently inserted every 5 minutes; we can run every second, but we would quickly exceed the AWS free tier to store all of that data, so we throttled it down to every 5 minutes.<br><br>
 
         <u>Example request</u>: <br>
-        <strong>https://cryptocurrencymarketchains.com/api/getdataformarketinrange/BTC_ADX_ETH.1531637407871.1531637828209</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/getdataformarketinrange/BTC_ADX_ETH.1531637407871.1531637828209</strong><br><br>
 
         <u>Example successful response</u>: <br>
         {<br>
@@ -67,7 +67,7 @@
         Call to DynamoDB to get all of the valid market chains. This is used on the graph page to populate the drop down for selecting and adding/removing new graphs. The values are updated and new values are added by a background Lambda function running once a day.<br><br>
 
         <u>Example request</u>: <br>
-        <strong>https://cryptocurrencymarketchains.com/api/getallvalidmarketnames</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/getallvalidmarketnames</strong><br><br>
 
         <u>Example successful response</u>:<br>
         {<br>
@@ -96,7 +96,7 @@
         Call to DynamoDB to get the "left" and "right" names for a given market chain. Used on the graph page in the legend for each graph. For example, if you are looking for the left and right names for BTC_ADX_ETH, the corresponding left name would be BTC_ETH_ADX_BTC (transfer from BTC to ETH to ADX and then back to BTC), and the corresponding right name woud be BTC_ADX_ETH_BTC (transfer from BTC to ADX to ETH and back to BTC.<br><br>
 
         <u>Example request</u>:<br>
-        <strong>https://cryptocurrencymarketchains.com/api/getmarketnames/BTC_ADX_ETH</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/getmarketnames/BTC_ADX_ETH</strong><br><br>
 
         <u>Example successful response</u>:<br>
         {<br>
@@ -116,7 +116,7 @@
         Call to <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a> to get the base market chain data (i.e. data for each of BTC_ETH and ETH_ADX and BTC_ADX), which is then used to calculate the left and right full chain values (in the previous example, going from BTC to ETH to ADX and then back to BTC or going from BTC to ADX to ETH and then back to BTC, respectively). Used on the main table page as described. Specifically, the Bid and Ask values are used.<br><br>
 
         <u>Example request</u>: <br>
-        <strong>https://cryptocurrencymarketchains.com/api/marketsummaries</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/marketsummaries</strong><br><br>
 
         <u>Example successful response</u>:<br>
         {<br>
@@ -165,7 +165,7 @@
         Call to <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a> to get all of the possible base market chains (for example, BTC-ETH and BTC-ADX and ETH-ADX) with which we can then get the left and right full chain names. Used on the main table (home) page as descibed.  <br><br>
 
         <u>Example request</u>: <br>
-        <strong>https://cryptocurrencymarketchains.com/api/markets</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/markets</strong><br><br>
 
         <u>Example successful response</u>:<br>
         {<br>
@@ -211,7 +211,7 @@
         Call to <a href="https://support.bittrex.com/hc/en-us/articles/115003723911">Bittrex's external API</a> to get the Bid and Ask values for a base market chain for use in calculating the full chain values. These values are also returned in /api/marketsummaries, so this individualized call is not used in our application.<br><br>
 
         Example:<br>
-        <strong>https://cryptocurrencymarketchains.com/api/markets/BTC-LTC</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/markets/BTC-LTC</strong><br><br>
 
         <u>Example successful response</u>:<br>
         {<br>
@@ -238,7 +238,7 @@
         Call to <a href="https://www.cryptocompare.com/api">CryptoCompare's external API</a> to get the coin images for each individual coin (for example, BTC or LTC). The returned links are each appended to the external API url to get the images. Used on the main table (home) page to get the images for each coin.<br><br>
 
         <u>Example request</u>:<br>
-        <strong>https://cryptocurrencymarketchains.com/api/coins</strong><br><br>
+        <strong>http://cryptomarketchains.com/api/coins</strong><br><br>
 
         <u>Example successful response</u>:<br>
         {<br>
