@@ -42,7 +42,8 @@ var points = null;
 var legend = null;
 var mouseGraph = null, mouseLines = null;
 var x, y, xAxis, yAxis;
-var margin = {top: 20, right: 70, bottom: 70, left: 80},
+var margin = {top: 20, right: 70, bottom: 70, left: 80, 
+			  legendheight: MAX_MARKETS*2*25},
     width = 1000 - margin.left - margin.right,
     height = 550 - margin.top - margin.bottom;
 
@@ -272,11 +273,12 @@ function removeMarketFromGraph(marketName) {
 // creates SVG for the D3 line graph
 function createD3SVG() {
 
-	var xDomainLeft = parseInt(graphData[0][0].x) -
-		(parseInt(Date.now()) - parseInt(graphData[0][0].x));
+	var xDomainLeft = parseInt(graphData[0][0].x) - 1000000;
+
+	var xDomainRight = parseInt(graphData[0][graphData[0].length - 1].x) + 1000000;
 
 	x = d3.time.scale()
-	    .domain([ xDomainLeft, parseInt(Date.now()) + 1000000 ])
+	    .domain([xDomainLeft, xDomainRight])
 	    .range([0, width]);
 
 	y = d3.scale.linear()
@@ -300,13 +302,13 @@ function createD3SVG() {
 	var zoom = d3.behavior.zoom()
 	    .x(x)
 	    .y(y)
-	    .scaleExtent([1, 2000])
+	    .scaleExtent([0, 2000])
 	    .on("zoom", zoomed);
 
 	svg = d3.select("#svg-wrapper").append("svg")
 		.call(zoom)
 	    .attr("width", width + margin.left + margin.right)
-	    .attr("height", height + margin.top + margin.bottom)
+	    .attr("height", height + margin.top + margin.bottom + margin.legendheight)
 		.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -432,7 +434,7 @@ function updateD3LineGraph() {
 		.append('circle')
 		.attr('class','dot')
 		.attr("r", 2.5)
-		.attr('fill', function(d,i){
+		.attr('fill', function(d,i) {
 			return colors[d.index%colors.length];
 		})
 		.attr("transform", function(d) {
@@ -478,15 +480,46 @@ function addD3LegendToGraph() {
 		.text(function (d, i) {
 			var returnVal;
 			Object.keys(displayedMarkets).forEach( function(key) {
-				if (displayedMarkets[key].graphDataPosLeft == i) {
+				if (displayedMarkets[key].graphDataPosLeft == i)
 					returnVal = displayedMarkets[key].MarketLeftName;
-				}
-				else if (displayedMarkets[key].graphDataPosRight == i ) 
+				else if (displayedMarkets[key].graphDataPosRight == i) 
 					returnVal = displayedMarkets[key].MarketRightName;
 			});
 
 			return returnVal.replace(new RegExp(" &#10236; ", 'g'), "⟼");
-		}); 
+		});
+
+	legend.append('text')
+		.attr("transform", function(d, i) {
+			if (i % 2 == 0) 
+				return "translate(" + (margin.left - 80) + "," + ((i / 2) * 18 + height + margin.top + margin.bottom) + ")";
+			else 
+				return "translate(" + (margin.left - 80) + "," + (((i - 1) / 2) * 18 + height + margin.top + margin.bottom) + ")";
+		})
+		.on("click", function(d, i) {
+			var notFound = true;
+			Object.keys(displayedMarkets).forEach( function(key) {
+				if (notFound && (displayedMarkets[key].graphDataPosLeft == i
+					|| displayedMarkets[key].graphDataPosRight == i)) {
+					notFound = false;
+					removeMarketFromGraph(key);
+				}
+			});
+		})
+		.style('fill', function(d, i) {
+			return "#666666";
+		})
+		.style("font-size", "12px")
+		.text(function (d, i) {
+			var returnVal = "";
+			Object.keys(displayedMarkets).forEach( function(key) {
+				if (displayedMarkets[key].graphDataPosLeft == i)
+					returnVal = key.replace(new RegExp("_", 'g'), "⟼") + " [Click to Remove]";
+			});
+
+			return returnVal;
+		})
+		.style("cursor", "pointer");
 }
 
 
@@ -701,6 +734,7 @@ function getMarketDataForMarketInRangeCallback(data) {
 	if (svg == null) {
 		createD3SVG();
 	}
+
 	createD3LineGraph();
 }
 

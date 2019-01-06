@@ -21,7 +21,7 @@ function getMarketDataForMarketInRange(marketData, callback) {
         url: GET_DATA_FOR_MARKET_IN_RANGE + marketData.marketname + "." + marketData.start + "." + marketData.end,
         async: true,
         success: (function(data) {
-            console.log("Got all market data for " + marketData.marketname);
+            // console.log("Got all market data for " + marketData.marketname);
 
             var retVal = {};
             retVal[marketData.marketname] = [];
@@ -47,7 +47,7 @@ function getMarketNamesForMarket(name, callback) {
         url: GET_MARKET_NAMES + name,
         async: true,
         success: (function(data) {
-            console.log("Got chain names for: " + name + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
+            //console.log("Got chain names for: " + name + " - " + data.Item.MarketLeftName.S + " - " + data.Item.MarketRightName.S);
 
             var retVal = {
                 "MarketChainName": name,
@@ -67,7 +67,7 @@ function getAllValidMarketNames(callback) {
         async: true,
         dataType: 'json',
         success: (function(data) {
-            console.log("Got all Market Chain Names");
+            // console.log("Got all Market Chain Names");
 
             var retVal = [];
             data.Items.forEach(function(item) {
@@ -86,33 +86,33 @@ function getAllValidMarketNames(callback) {
  
 // Posts a valid market and its corresponding left and right names into dynamoDB
 function postValidMarket(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_VALID_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
-         })
-     });
+    $.ajax({
+        type: 'POST',
+        url: POST_VALID_MARKET,
+        async: true,
+        data: JSON.stringify(marketData),
+        dataType: 'json',
+        contentType: "application/json",
+        success: (function(data) {
+            console.log("Return succsessful for adding market names for: " + marketData.MarketChainName);
+        })
+    });
 }
 
 
 // Posts the data for a given market at a given timestamp
 function postMarketData(marketData) {
-     $.ajax({
-         type: 'POST',
-         url: POST_DATA_FOR_MARKET,
-         async: true,
-         data: JSON.stringify(marketData),
-         dataType: 'json',
-         contentType: "application/json",
-         success: (function(data) {
-             console.log("Return succsessful for data post for: " + marketData.MarketChainName);
-         })
-     });
+    $.ajax({
+        type: 'POST',
+        url: POST_DATA_FOR_MARKET,
+        async: true,
+        data: JSON.stringify(marketData),
+        dataType: 'json',
+        contentType: "application/json",
+        success: (function(data) {
+            console.log("Return succsessful for data post for: " + marketData.MarketChainName);
+        })
+    });
 }
 
 *****************************************************************************************************
